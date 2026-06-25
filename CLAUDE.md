@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code when working with this repository.
 
+> **Fork notice:** This is a short-lived fork of ChilliCream/graphql-platform. Before doing
+> any work, read [`FORK.md`](./FORK.md) for the fork's mission, remotes, branch-per-concern
+> workflow, release-branch naming, and the tracked Strawberry Shake work items.
+
 ## Build
 
 ### Website
