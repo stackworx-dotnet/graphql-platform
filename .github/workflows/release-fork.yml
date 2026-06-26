@@ -11,8 +11,8 @@ name: 🚀 Release Fork Packages
 #     (e.g. release/fork-16.3.0) and the version.
 #   * By tag:   push a tag like `fork-16.3.0` on the ref you want to publish (the version is the
 #     tag minus the `fork-` prefix).
-# Publishes via NuGet trusted publishing (OIDC) using the NuGet/login action; requires a
-# `NUGET_USERNAME` secret and a trusted-publishing policy on nuget.org for each forked package.
+# Publishes via NuGet trusted publishing (OIDC) using the NuGet/login action; requires the
+# `NUGET_USER` organization variable and a trusted-publishing policy on nuget.org per package.
 
 on:
   workflow_dispatch:
@@ -87,7 +87,7 @@ jobs:
         if: ${{ github.event_name == 'push' || github.event.inputs.dry_run != 'true' }}
         uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1
         with:
-          user: ${{ secrets.NUGET_USERNAME }}
+          user: ${{ vars.NUGET_USER }}
 
       - name: Push to NuGet
         if: ${{ github.event_name == 'push' || github.event.inputs.dry_run != 'true' }}
