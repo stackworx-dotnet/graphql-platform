@@ -87,6 +87,8 @@ dotnet test src/StrawberryShake/CodeGeneration/test/CodeGeneration.CSharp.Tests/
 
 - **Upstream:** PR [#9636](https://github.com/ChilliCream/graphql-platform/pull/9636)
   (author `cliedeman`), fixes [#9635](https://github.com/ChilliCream/graphql-platform/issues/9635).
+- **Fork PR:** [#3](https://github.com/stackworx-dotnet/graphql-platform/pull/3) (the head branch
+  lives on the `stackworx` fork; assemble by cherry-picking commit `92e37555e7`).
 - **Branch:** `fix/razor-operation-interface`.
 - **What:** generated `Use*` components inject the operation **interface**
   (`IGetBarsQuery`) instead of the concrete runtime type (`GetBarsQuery`), so components are
@@ -103,34 +105,35 @@ dotnet test src/StrawberryShake/CodeGeneration/test/CodeGeneration.CSharp.Tests/
 ### 2. Razor components: persisted component state / pre-rendering (new feature)
 
 - **Relates to:** upstream issue [#7209](https://github.com/ChilliCream/graphql-platform/issues/7209).
-- **Branch:** `feat/razor-persistent-component-state`.
-- **Goal:** generated Blazor components survive the prerender -> interactive boundary using
-  `PersistentComponentState`, so the query is not re-executed on the client after a server
-  prerender (`InteractiveAuto` / `InteractiveServer`).
-- **The showstopper (from #7209):** operation results are **interfaces** (`IGetBarsResult`).
-  `PersistentComponentState.PersistAsJson` / `TryTakeFromJson` cannot (de)serialize
-  interfaces, and the concrete result classes reference entities in `IEntityStore`, so they
-  do not round-trip cleanly either.
-- **Recommended approach:** persist the **raw transport JSON** (`data` payload) of the latest
-  `IOperationResult`, not the typed result. On interactive init, take the payload back and
-  rehydrate it through the existing generated `JsonResultBuilder` -> `IEntityStore` -> typed
-  result, then `Subscribe(Operation.Watch(...))`. This reuses the existing deserialization
-  path and avoids interface serialization entirely. First verify the raw `JsonDocument` is
-  still reachable from the result; if not, capture it in the result builder / operation store.
-- **Touch points:**
-  - Runtime: `src/StrawberryShake/Client/src/Razor/UseQuery.cs` (and `UseSubscription.cs`,
-    `DataComponent.cs`) - add **opt-in** `PersistentComponentState` wiring: register-on-persisting
-    to save the latest payload during prerender; on the first interactive init, take + seed the
-    store before subscribing.
-  - Generators: `RazorQueryGenerator.cs` / `RazorSubscriptionGenerator.cs` - emit the wiring
-    (inject `PersistentComponentState`, a stable persistence key per operation + args, opt-in
-    flag). Keep generated output minimal and behind an opt-in so non-prerender apps are
-    unaffected.
-  - Tests: update `CodeGeneration.Razor.Tests` golden snapshots; add a focused test for the
-    persisted-state wiring.
-- **Design questions to settle before coding:** persistence key scheme (operation name +
-  serialized args); opt-in mechanism (component parameter vs `.graphqlrc.json` generator
-  setting); behavior when the payload is absent; subscription/SSE interaction (see #6944).
+- **Fork PR:** [#2](https://github.com/stackworx-dotnet/graphql-platform/pull/2).
+- **Branch:** `feat/razor-persistent-state-attribute`.
+- **Goal:** operation results survive the prerender -> interactive boundary so the query is not
+  re-executed on the client after a server prerender (`InteractiveAuto` / `InteractiveServer`).
+- **The showstopper (from #7209):** operation results are **interfaces** (`IGetBarsResult`), which
+  `System.Text.Json` (and so `PersistAsJson` / `TryTakeFromJson`) cannot (de)serialize, and the
+  concrete result classes reference entities in `IEntityStore`, so they do not round-trip either.
+- **Approach (shipped):** use .NET 10's declarative `[PersistentState]` with a custom
+  `PersistentComponentStateSerializer<IOperationResult<T>>`. The serializer persists the **raw
+  transport `data` payload** (captured into `IOperationResult.ContextData`) and rehydrates it
+  through the existing generated result builder (`BuildFromPersistedData` -> `IEntityStore` ->
+  typed result), avoiding interface serialization entirely. The generated client auto-registers
+  one serializer per result type (singletons, behind `#if NET10_0_OR_GREATER`); opt in with
+  `"razorPersistedState": true` in `.graphqlrc.json`. Consumer usage is a plain component:
+  `[PersistentState] public IOperationResult<IGetMeResult>? Result { get; set; }` then
+  `Result ??= await Client.GetMe.ExecuteAsync(ct)`.
+- **Constraints:** **.NET 10+ only** (the serializer type is .NET 10); snapshot, not reactive
+  (no `Watch` / store-update subscription); requires a store and a `StrawberryShake.Razor` reference.
+- **Earlier direction (closed):** a generated `UsePersistentQuery<T>` reactive component
+  (fork PR [#1](https://github.com/stackworx-dotnet/graphql-platform/pull/1), branch
+  `feat/razor-persistent-component-state`) was explored and closed as the wrong direction - it
+  added a parallel component base plus an `OperationExecutor.Watch` overload for capability the
+  serializer approach already covers. If reactive components ever need persisted state, enhance
+  the existing `UseQuery<T>` on top of this serializer rather than reviving that base.
+- **Touch points:** runtime `OperationResultBuilder` (capture + `BuildFromPersistedData`),
+  `IOperationResultBuilder` (`BuildFromPersistedData` default-interface-method),
+  `OperationResultPersistentStateSerializer` (`StrawberryShake.Razor`); generators
+  `JsonResultBuilderGenerator` (capture override) and `DependencyInjectionGenerator` (serializer
+  registration); the `RazorPersistedState` generator setting.
 - **Build against current `main`, not vnext** (#9977), for fork longevity.
 
 ## Candidate issues & PRs
@@ -141,8 +144,8 @@ branch. The two tracked items above are pre-marked. PRs are the realistic cherry
 
 | Address? | ID | Type | Title | Author | Branch / notes |
 | --- | --- | --- | --- | --- | --- |
-| **Yes** | [#9636](https://github.com/ChilliCream/graphql-platform/pull/9636) | PR | Use Operation interface type instead of runtime type (fixes #9635) | cliedeman | `fix/razor-operation-interface` - tracked item 1 |
-| **Yes** | [#7209](https://github.com/ChilliCream/graphql-platform/issues/7209) | Issue | Make StrawberryShake play nicely with Blazor `PersistentComponentState` | nloum | `feat/razor-persistent-component-state` - tracked item 2 |
+| **Yes** | [#9636](https://github.com/ChilliCream/graphql-platform/pull/9636) | PR | Use Operation interface type instead of runtime type (fixes #9635) | cliedeman | `fix/razor-operation-interface` - tracked item 1; fork PR [#3](https://github.com/stackworx-dotnet/graphql-platform/pull/3) |
+| **Yes** | [#7209](https://github.com/ChilliCream/graphql-platform/issues/7209) | Issue | Make StrawberryShake play nicely with Blazor `PersistentComponentState` | nloum | `feat/razor-persistent-state-attribute` - tracked item 2; fork PR [#2](https://github.com/stackworx-dotnet/graphql-platform/pull/2) (supersedes closed [#1](https://github.com/stackworx-dotnet/graphql-platform/pull/1)) |
 | ☐ | [#9476](https://github.com/ChilliCream/graphql-platform/pull/9476) | PR | Fix `@rename` directive on input type fields | waldemarsson | – |
 | ☐ | [#9275](https://github.com/ChilliCream/graphql-platform/pull/9275) | PR | Preserve unset SS input field state (fixes #8325) | michaelstaib | – |
 | ☐ | [#8531](https://github.com/ChilliCream/graphql-platform/pull/8531) | PR (draft) | Add "Unknown Enum" support | N-Olbert | – |
@@ -159,6 +162,100 @@ branch. The two tracked items above are pre-marked. PRs are the realistic cherry
 > above is the actionable candidate set (open PRs + the Razor/Blazor-relevant issues). Ask to
 > append the full open backlog, or any filtered slice (e.g. all codegen bugs), if you want to
 > triage beyond this set.
+
+## Packaging & publishing
+
+Which packages we actually fork, which we re-use from upstream, and how they are renamed.
+
+### How Strawberry Shake ships (this decides what we fork)
+
+The code generator is **not** a standalone package. There are two delivery surfaces:
+
+- **Generator** (`StrawberryShake.CodeGeneration` + `StrawberryShake.CodeGeneration.CSharp`) is
+  `IsPackable=false`. It is compiled into the `dotnet-graphql` CLI (`StrawberryShake.Tools`),
+  which is then **bundled as binaries** (`tools/net8|9|10|11/dotnet-graphql.dll`) inside the
+  build-integrated meta packages (`StrawberryShake.Blazor`, `.Server`, `.Maui`). At consumer
+  build time `StrawberryShake.targets` runs that bundled DLL (`-r` turns on the Razor
+  generators); it does **not** use the globally-installed tool. So a generator change reaches
+  consumers through the **meta package that bundles it**, not through a generator package.
+- **Runtime** ships as ordinary libraries (`StrawberryShake.Core`, `StrawberryShake.Razor`,
+  `StrawberryShake.Transport.*`, ...). The Blazor base classes (`UseQuery` / `UseSubscription`
+  / `DataComponent`) live in `StrawberryShake.Razor`.
+
+Published-package dependency graph:
+
+```
+StrawberryShake.Blazor (meta) ── bundles ──> dotnet-graphql (StrawberryShake.Tools, carries the generator)
+   └─ deps: StrawberryShake.Core, StrawberryShake.Razor, Transport.Http, Transport.WebSockets
+StrawberryShake.Razor ── dep ──> StrawberryShake.Core
+StrawberryShake.Server / .Maui (meta) ── bundle the same tool; deps: Core, Transport.Http, Transport.WebSockets (no Razor)
+StrawberryShake (meta) ── dep ──> StrawberryShake.Core   (abstractions only: no tool, no Razor)
+```
+
+### What item 2 changes
+
+- Generators `RazorQueryGenerator.cs` / `RazorSubscriptionGenerator.cs` (in `CodeGeneration.CSharp`)
+  -> flow into the bundled `dotnet-graphql`.
+- Runtime `UseQuery.cs` / `UseSubscription.cs` / `DataComponent.cs` (in `StrawberryShake.Razor`).
+
+Both are **Blazor-only**: the runtime change is in `Razor`, and the generator change only fires
+when `GraphQLRazorComponents=enable` (Blazor consumers). Server/Maui consumers neither reference
+`Razor` nor generate Razor components, so the patched tool is inert for them.
+
+### Minimal fork + publish set (item 2)
+
+| Package | Why it must be forked | Publish? |
+| --- | --- | --- |
+| `StrawberryShake.Razor` | Contains the changed runtime base classes. | **Yes.** |
+| `StrawberryShake.Blazor` | Bundles the patched `dotnet-graphql` (generator change) **and** depends on the changed `Razor`. This is what a Blazor consumer installs. | **Yes.** |
+| `StrawberryShake.Tools` (global CLI) | Carries the patched generator. | **Optional** — only if you also publish the standalone `dotnet graphql` CLI for manual generation. The meta-package build path does not use it. |
+
+### Re-use from upstream (do NOT fork)
+
+Everything the change does not touch is consumed straight from ChilliCream's nuget.org packages at
+the upstream base version: `StrawberryShake.Core`, `StrawberryShake.Transport.Http`,
+`.Transport.WebSockets`, `.Transport.InMemory`, `.Persistence.SQLite`, `.Resources`,
+`.Tools.Configuration`, the base `StrawberryShake` meta, `StrawberryShake.Server`,
+`StrawberryShake.Maui`, and all `HotChocolate.*`. Server/Maui are **not** forked even though they
+bundle the tool, because the generator change is inert without Razor generation.
+
+### Rename scheme
+
+NuGet reserves the `StrawberryShake` ID prefix to ChilliCream, so a public fork cannot republish
+under any `StrawberryShake.*` ID. Forked packages are renamed under our `Stackworx.` prefix;
+**only the `PackageId` changes** — `AssemblyName`, `RootNamespace`, and the public namespaces stay
+`StrawberryShake.*`, so the fork is a drop-in replacement (existing `using StrawberryShake.Razor;`
+and the generated code keep working).
+
+| Upstream PackageId | Fork PackageId | AssemblyName (unchanged) |
+| --- | --- | --- |
+| `StrawberryShake.Razor` | `Stackworx.StrawberryShake.Razor` | `StrawberryShake.Razor` |
+| `StrawberryShake.Blazor` | `Stackworx.StrawberryShake.Blazor` | `StrawberryShake.Blazor` |
+| `StrawberryShake.Tools` (if published) | `Stackworx.StrawberryShake.Tools` | `dotnet-graphql` |
+
+### Versioning & dependency pinning (the gotcha)
+
+`dotnet pack` turns each in-repo `ProjectReference` into a package dependency at the **build
+version** (`-p:Version=`). So how the forked packages reference the unchanged ones depends on the
+version you publish at:
+
+- **Model A — fork version == upstream base version (e.g. publish at `16.3.0`).** Leave the csproj
+  `ProjectReference`s as-is. `Stackworx.StrawberryShake.Blazor 16.3.0` then emits deps on
+  `StrawberryShake.Core 16.3.0` / `Transport.* 16.3.0` (resolve to the upstream originals) plus
+  `Stackworx.StrawberryShake.Razor 16.3.0` (our fork). Simplest, and the rename below supports it
+  directly. Limitation: you cannot ship a second fork build of the same base (can't push `16.3.0`
+  twice) — this conflicts with the `release/fork-16.0.0.<ext>` iteration scheme above.
+- **Model B — independent fork version (e.g. `16.3.0-stackworx.1`).** Required for iterating on a
+  base. Pin the **unchanged** deps explicitly: in the forked csproj replace the unchanged
+  `ProjectReference`s with `PackageReference`s pinned to the upstream base (e.g.
+  `StrawberryShake.Core` `16.3.0`), and keep the `ProjectReference` to the other **forked** project
+  (`Razor`). Otherwise they would resolve to a non-existent `StrawberryShake.Core 16.3.0-stackworx.1`.
+  Do this in a dedicated pack step / on the `release/fork-*` branch, **not** in the shared dev
+  csproj — pointing the meta package at a NuGet `Core` while its siblings build from source can
+  confuse the local `All.slnx` build.
+
+Recommended: publish at the upstream base version (Model A) for the first release; switch to pinned
+`PackageReference`s (Model B) only when you need to iterate on a base.
 
 ## Retiring the fork
 
