@@ -1,7 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
 
   <PropertyGroup>
-    <PackageId>StrawberryShake.Blazor</PackageId>
+    <!-- Fork: published under the Stackworx prefix (NuGet reserves StrawberryShake.* to
+         ChilliCream). AssemblyName/RootNamespace stay StrawberryShake.Blazor so this is a
+         drop-in replacement. Bundles the patched dotnet-graphql and depends on the forked
+         Razor runtime. See FORK.md "Packaging & publishing". -->
+    <PackageId>Stackworx.StrawberryShake.Blazor</PackageId>
     <AssemblyName>StrawberryShake.Blazor</AssemblyName>
     <RootNamespace>StrawberryShake.Blazor</RootNamespace>
     <Description>StrawberryShake GraphQL Client for Blazor.</Description>

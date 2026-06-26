@@ -9,7 +9,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>StrawberryShake.Tools</PackageId>
+    <!-- Fork: published under the Stackworx prefix (NuGet reserves StrawberryShake.* to
+         ChilliCream). AssemblyName stays dotnet-graphql so the tool command is unchanged.
+         Carries the patched generator; publish only if the standalone CLI is needed (the
+         meta packages bundle these binaries directly). See FORK.md "Packaging & publishing". -->
+    <PackageId>Stackworx.StrawberryShake.Tools</PackageId>
     <AssemblyName>dotnet-graphql</AssemblyName>
     <RootNamespace>StrawberryShake.Tools</RootNamespace>
   </PropertyGroup>

@@ -1,7 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <PackageId>StrawberryShake.Razor</PackageId>
+    <!-- Fork: published under the Stackworx prefix (NuGet reserves StrawberryShake.* to
+         ChilliCream). AssemblyName/RootNamespace stay StrawberryShake.Razor so this is a
+         drop-in replacement. See FORK.md "Packaging & publishing". -->
+    <PackageId>Stackworx.StrawberryShake.Razor</PackageId>
     <AssemblyName>StrawberryShake.Razor</AssemblyName>
     <RootNamespace>StrawberryShake.Razor</RootNamespace>
     <Description>Provides razor components for using StrawberryShake.</Description>
