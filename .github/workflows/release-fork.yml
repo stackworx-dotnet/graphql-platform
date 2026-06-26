@@ -11,7 +11,8 @@ name: 🚀 Release Fork Packages
 #     (e.g. release/fork-16.3.0) and the version.
 #   * By tag:   push a tag like `fork-16.3.0` on the ref you want to publish (the version is the
 #     tag minus the `fork-` prefix).
-# Requires a `NUGET_API_KEY` repository secret.
+# Publishes via NuGet trusted publishing (OIDC) using the NuGet/login action; requires a
+# `NUGET_USERNAME` secret and a trusted-publishing policy on nuget.org for each forked package.
 
 on:
   workflow_dispatch:
@@ -30,6 +31,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write # required for NuGet trusted publishing (OIDC)
 
 jobs:
   release-fork:
@@ -80,17 +82,20 @@ jobs:
           done
           ls -l "${{ github.workspace }}/output/packages"
 
+      - name: NuGet login (trusted publishing)
+        id: login
+        if: ${{ github.event_name == 'push' || github.event.inputs.dry_run != 'true' }}
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1
+        with:
+          user: ${{ secrets.NUGET_USERNAME }}
+
       - name: Push to NuGet
         if: ${{ github.event_name == 'push' || github.event.inputs.dry_run != 'true' }}
         shell: bash
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
         run: |
           set -euo pipefail
-          if [ -z "${NUGET_API_KEY:-}" ]; then
-            echo "::error::Set the NUGET_API_KEY repository secret to publish."
-            exit 1
-          fi
           for nupkg in "${{ github.workspace }}"/output/packages/*.nupkg; do
             echo "Pushing $(basename "$nupkg")"
             dotnet nuget push "$nupkg" \
