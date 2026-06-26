@@ -74,6 +74,7 @@
     <PackageVersion Include="System.Net.ServerSentEvents" Version="10.0.0" />
     <PackageVersion Include="System.Reactive" Version="6.1.0" />
     <PackageVersion Include="Testcontainers" Version="4.11.0" />
+    <PackageVersion Include="bunit" Version="2.7.2" />
     <PackageVersion Include="xunit.assert" Version="2.9.3" />
     <PackageVersion Include="xunit.extensibility.core" Version="2.9.3" />
     <PackageVersion Include="xunit.extensibility.execution" Version="2.9.3" />
