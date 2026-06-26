@@ -1,0 +1,100 @@
+name: 🚀 Release Fork Packages
+
+# Publishes ONLY the forked StrawberryShake packages, renamed under the Stackworx.* prefix:
+#   * Stackworx.StrawberryShake.Razor   - runtime base classes
+#   * Stackworx.StrawberryShake.Blazor  - meta package; bundles the patched dotnet-graphql tool
+#   * Stackworx.StrawberryShake.Tools   - dotnet-graphql CLI
+# Everything else is consumed from upstream nuget.org. See FORK.md "Packaging & publishing".
+#
+# How to run:
+#   * Manually: Actions -> "Release Fork Packages" -> Run workflow; pick the ref to publish
+#     (e.g. release/fork-16.3.0) and the version.
+#   * By tag:   push a tag like `fork-16.3.0` on the ref you want to publish (the version is the
+#     tag minus the `fork-` prefix).
+# Requires a `NUGET_API_KEY` repository secret.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "NuGet package version to publish (e.g. 16.3.0)."
+        required: true
+        default: "16.3.0"
+      dry_run:
+        description: "Pack only; skip the push to NuGet."
+        type: boolean
+        default: false
+  push:
+    tags:
+      - "fork-*" # e.g. fork-16.3.0 -> publishes version 16.3.0
+
+permissions:
+  contents: read
+
+jobs:
+  release-fork:
+    name: Pack and publish forked packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@9a946fdbd5fb07b82b2f5a4466058b876ab72bb2 # v5.3.0
+        with:
+          dotnet-version: |
+            8.x
+            9.x
+            10.x
+            11.0.100-preview.5.26302.115
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "push" ]; then
+            version="${GITHUB_REF_NAME#fork-}"
+          else
+            version="${{ github.event.inputs.version }}"
+          fi
+          if [ -z "$version" ]; then
+            echo "::error::Could not resolve a package version."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Publishing forked packages at version $version"
+
+      - name: Pack forked packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          for proj in \
+            "src/StrawberryShake/Client/src/Razor/StrawberryShake.Razor.csproj" \
+            "src/StrawberryShake/MetaPackages/Blazor/StrawberryShake.Blazor.csproj" \
+            "src/StrawberryShake/Tooling/src/dotnet-graphql/dotnet-graphql.csproj"; do
+            dotnet pack "$proj" \
+              -c Release \
+              -o "${{ github.workspace }}/output/packages" \
+              -p:Version="${{ steps.version.outputs.version }}"
+          done
+          ls -l "${{ github.workspace }}/output/packages"
+
+      - name: Push to NuGet
+        if: ${{ github.event_name == 'push' || github.event.inputs.dry_run != 'true' }}
+        shell: bash
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${NUGET_API_KEY:-}" ]; then
+            echo "::error::Set the NUGET_API_KEY repository secret to publish."
+            exit 1
+          fi
+          for nupkg in "${{ github.workspace }}"/output/packages/*.nupkg; do
+            echo "Pushing $(basename "$nupkg")"
+            dotnet nuget push "$nupkg" \
+              --source https://api.nuget.org/v3/index.json \
+              --api-key "$NUGET_API_KEY" \
+              --skip-duplicate
+          done
