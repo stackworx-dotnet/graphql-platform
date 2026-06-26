@@ -72,6 +72,18 @@ public partial class JsonResultBuilderGenerator : ClassBaseGenerator<ResultBuild
                 .SetAccessModifier(AccessModifier.Protected)
                 .SetOverride());
 
+        // Capture the raw transport "data" payload so the result can be persisted via the
+        // .NET 10 [PersistentState] attribute and rehydrated without re-executing.
+        if (settings.RazorPersistedState && settings.IsStoreEnabled())
+        {
+            classBuilder
+                .AddProperty("CapturePersistedData")
+                .SetType("global::System.Boolean")
+                .SetAccessModifier(AccessModifier.Protected)
+                .SetOverride()
+                .AsLambda("true");
+        }
+
         var assignment = AssignmentBuilder
             .New()
             .SetLeftHandSide(GetPropertyName(ResultDataFactory))

@@ -13,13 +13,15 @@ public class CSharpSyntaxGeneratorSettings
         bool noStore,
         bool inputRecords,
         bool entityRecords,
-        bool razorComponents)
+        bool razorComponents,
+        bool razorPersistedState)
     {
         AccessModifier = accessModifier;
         NoStore = noStore;
         InputRecords = inputRecords;
         EntityRecords = entityRecords;
         RazorComponents = razorComponents;
+        RazorPersistedState = razorPersistedState;
     }
 
     /// <summary>
@@ -46,4 +48,11 @@ public class CSharpSyntaxGeneratorSettings
     /// Generate Razor components.
     /// </summary>
     public bool RazorComponents { get; }
+
+    /// <summary>
+    /// Emit persisted component state wiring (raw payload capture and a
+    /// <c>PersistentComponentStateSerializer</c> registration per result type) so operation
+    /// results can be persisted via the .NET 10 <c>[PersistentState]</c> attribute.
+    /// </summary>
+    public bool RazorPersistedState { get; }
 }

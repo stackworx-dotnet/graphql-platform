@@ -61,6 +61,12 @@ public class StrawberryShakeSettings
     public bool? RazorComponents { get; set; }
 
     /// <summary>
+    /// Defines if generated operation results shall be persistable via the .NET 10
+    /// <c>[PersistentState]</c> attribute. Requires a store.
+    /// </summary>
+    public bool? RazorPersistedState { get; set; }
+
+    /// <summary>
     /// Gets the record generator settings.
     /// </summary>
     public StrawberryShakeSettingsRecords Records { get; } =
