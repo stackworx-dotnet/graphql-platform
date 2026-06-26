@@ -627,7 +627,7 @@ public class DependencyInjectionGenerator : CodeGenerator<DependencyInjectionDes
         string factory,
         string resultBuilder)
     {
-        return CodeBlockBuilder
+        var code = CodeBlockBuilder
             .New()
             .AddCode(
                 MethodCallBuilder
@@ -756,6 +756,28 @@ public class DependencyInjectionGenerator : CodeGenerator<DependencyInjectionDes
                         .SetMethodName(GetRequiredService)
                         .AddGeneric(operationFullName)
                         .AddArgument(Sp))));
+
+        // Register a persistent component state serializer so the operation result can be
+        // persisted via the .NET 10 [PersistentState] attribute and rehydrated without
+        // re-executing the operation. Guarded so consumers targeting older frameworks (where
+        // the serializer type does not exist) still compile.
+        if (settings.RazorPersistedState && settings.IsStoreEnabled())
+        {
+            code
+                .AddCode(CodeLineBuilder.From("#if NET10_0_OR_GREATER"))
+                .AddCode(MethodCallBuilder
+                    .New()
+                    .SetMethodName(AddSingleton)
+                    .AddGeneric(
+                        PersistentComponentStateSerializer
+                            .WithGeneric(IOperationResult.WithGeneric(resultInterface)))
+                    .AddGeneric(
+                        OperationResultPersistentStateSerializer.WithGeneric(resultInterface))
+                    .AddArgument(Services))
+                .AddCode(CodeLineBuilder.From("#endif"));
+        }
+
+        return code;
     }
 
     private static ICode RegisterHttpConnection(string clientName) =>
