@@ -34,7 +34,12 @@ StrawberryShake explicitly (`removeAliasesOnLeafFields`: *"to improve compatibil
 with Strawberry Shake"*; `flattenInlineFragmentsSameType` + `dedupeSelectionSet`),
 which is what pointed this fuzzer at fragments.
 
-> Aggregate over the full ~12k-doc corpus is appended at the end (filled after the run).
+**Full-corpus result:** of **11,800** distinct graphql-js-valid documents, StrawberryShake
+failed on **122** (~1%), across exactly **two** signatures: **118** hit Finding 2 (CS0528,
+non-compiling output) and **4** hit Finding 1 (generator throw). No other failure
+signature survived once the `DateTime` scalar binding (see "Not a finding" below) was
+corrected, and StrawberryShake's parser never disagreed with graphql-js (no parse
+mismatch). Both findings minimize to one-line repros (next sections).
 
 ---
 
