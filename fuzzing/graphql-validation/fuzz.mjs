@@ -29,6 +29,7 @@ const BASE = [
   '{ complicatedArgs { multipleReqs(req1: 1, req2: 2) } }',
   '{ complicatedArgs { enumArgField(enumArg: BROWN) } }',
   '{ complicatedArgs { complexArgField(complexArg: { requiredField: true }) } }',
+  '{ complicatedArgs { nestedArgField(nested: { required: 1, child: { requiredField: true }, ints: [1, 2] }) } }',
   '{ complicatedArgs { stringListArgField(stringListArg: ["a", "b"]) } }',
   '{ catOrDog { ... on Dog { name barkVolume } ... on Cat { meows } } }',
   'fragment F on Dog { name barkVolume } { dog { ...F } }',

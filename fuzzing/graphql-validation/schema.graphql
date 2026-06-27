@@ -83,6 +83,13 @@ input ComplexInput {
   stringListField: [String]
 }
 
+input NestedInput {
+  required: Int!
+  child: ComplexInput
+  children: [ComplexInput!]
+  ints: [Int!]
+}
+
 type ComplicatedArgs {
   intArgField(intArg: Int): String
   nonNullIntArgField(nonNullIntArg: Int!): String
@@ -94,6 +101,7 @@ type ComplicatedArgs {
   stringListArgField(stringListArg: [String]): String
   stringListNonNullArgField(stringListNonNullArg: [String!]): String
   complexArgField(complexArg: ComplexInput): String
+  nestedArgField(nested: NestedInput): String
   multipleReqs(req1: Int!, req2: Int!): String
   nonNullFieldWithDefault(arg: Int! = 0): String
   multipleOpts(opt1: Int = 0, opt2: Int = 0): String
