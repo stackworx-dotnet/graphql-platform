@@ -2,5 +2,8 @@ node_modules/
 corpus*.jsonl
 *-results.jsonl
 out*.json
+min.jsonl
+min-labels.json
+*.err
 bin/
 obj/

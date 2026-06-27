@@ -1,0 +1,3 @@
+"query Good { me { id name avatar { url width } } }"
+"query DupAlias { me { id x: name name } }"
+"{ syntactically broken "

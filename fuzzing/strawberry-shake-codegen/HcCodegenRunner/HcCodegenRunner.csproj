@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Throwaway differential-fuzzing harness for the StrawberryShake C# code
+    generator. Deliberately isolated from the repo's strict analyzer / multi-TFM
+    / warnings-as-errors settings. References the StrawberryShake SOURCE projects
+    so we generate against the repo's current code.
+
+    This project lives under fuzzing/ which is a SIBLING of src/, so it does NOT
+    inherit src/Directory.Packages.props (Central Package Management). The Roslyn
+    package therefore carries an explicit Version that matches the centrally
+    managed version in src/Directory.Packages.props (Microsoft.CodeAnalysis.CSharp
+    4.14.0).
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors></WarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;NU1605;NU1608;NU1701</NoWarn>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+    <RunAnalyzers>false</RunAnalyzers>
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <RestorePackagesWithLockFile>false</RestorePackagesWithLockFile>
+    <LangVersion>preview</LangVersion>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The generator itself (pulls in CodeGeneration + Resources transitively). -->
+    <ProjectReference Include="..\..\..\src\StrawberryShake\CodeGeneration\src\CodeGeneration.CSharp\StrawberryShake.CodeGeneration.CSharp.csproj" />
+    <!-- Runtime transports pinned by the copied CSharpCompiler.cs so the generated
+         code's references resolve via the loaded AppDomain assemblies.
+         Transport.Http transitively brings in StrawberryShake.Core. -->
+    <ProjectReference Include="..\..\..\src\StrawberryShake\Client\src\Transport.Http\StrawberryShake.Transport.Http.csproj" />
+    <ProjectReference Include="..\..\..\src\StrawberryShake\Client\src\Transport.InMemory\StrawberryShake.Transport.InMemory.csproj" />
+    <ProjectReference Include="..\..\..\src\StrawberryShake\Client\src\Transport.WebSockets\StrawberryShake.Transport.WebSockets.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+  </ItemGroup>
+
+</Project>
