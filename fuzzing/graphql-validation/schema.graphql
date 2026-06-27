@@ -50,6 +50,7 @@ type Dog implements Pet & Mammal & Canine {
   nickname: String
   barkVolume: Int
   barks: Boolean
+  tag: Int
   doesKnowCommand(dogCommand: DogCommand): Boolean
   isHouseTrained(atOtherHomes: Boolean = true): Boolean
   isAtLocation(x: Int, y: Int): Boolean
@@ -63,10 +64,13 @@ type Cat implements Pet {
   nickname: String
   meows: Boolean
   meowsVolume: Int
+  tag: String
   furColor: FurColor
 }
 
 union CatOrDog = Cat | Dog
+
+union DogOrHuman = Dog | Human
 
 type Human {
   name(surname: Boolean): String
@@ -114,6 +118,7 @@ type Query {
   cat: Cat
   pet: Pet
   catOrDog: CatOrDog
+  dogOrHuman: DogOrHuman
   complicatedArgs: ComplicatedArgs
 }
 

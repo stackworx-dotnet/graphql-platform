@@ -7,13 +7,17 @@ HotChocolate's full default rule set
 (`DocumentValidatorBuilder.New().AddDefaultRules()`), then diff. Prime signal:
 **reference reports invalid, HotChocolate reports valid**.
 
-Corpus: 36 curated seeds + ~70 hand-written hard cases ([hard.json](./hard.json),
-[hard2.json](./hard2.json)) + ~95k AST-mutation fuzz documents (seeded,
-reproducible) whose mutators span value coercion, field merging, directive
-locations, fragment spreads/cycles, variable usage/positions/types, and operation
-structure. Across all of it HotChocolate matched graphql-js except for the two
-findings below — notably the merge/directive/fragment/variable families (common
-divergence points) were clean. No `hc_extra` (HC stricter than the spec) was seen.
+Corpus: 36 curated seeds + ~95 hand-written hard cases ([hard.json](./hard.json),
+[hard2.json](./hard2.json), [hard3.json](./hard3.json) for interfaces/unions) +
+~125k AST-mutation fuzz documents (seeded, reproducible) whose mutators span value
+coercion, field merging, directive locations, fragment spreads/cycles, variable
+usage/positions/types, operation structure, and inline-fragment type conditions
+on abstract types. HotChocolate matched graphql-js except for the four findings
+below. Interface/union *structural* validation is solid — fragment-spread
+possibility, fields-on-abstract-types, and even `OverlappingFieldsCanBeMerged`'s
+`sameResponseShape` across mutually-exclusive union members all match graphql-js
+in both directions (the new gaps are on the `__typename` meta-field). No `hc_extra`
+(HC stricter than the spec) was seen.
 
 Related HotChocolate issues: searched `ChilliCream/graphql-platform` for `Int`
 range / `ValuesOfCorrectType` / input-value / scalar-literal validation — **no
@@ -112,6 +116,47 @@ A client can append `anyInputObjectArg: []` to an otherwise-invalid (or
 abuse-shaped) document and have HotChocolate's validator pass it as valid,
 bypassing all other validation rules. Worth confirming downstream behaviour
 (execution/coercion) and reporting upstream.
+
+## Finding 3 — `ScalarLeafs` not enforced on `__typename` under abstract types
+
+A selection set on the `__typename` meta-field is invalid (`__typename: String!`
+is a leaf). HotChocolate catches it when the parent is an object/root type but
+**not when the parent is a union or interface**:
+
+| query | graphql-js | HotChocolate |
+| --- | --- | --- |
+| `{ dog { __typename { x } } }` (object) | invalid | invalid |
+| `{ __typename { x } }` (root) | invalid | invalid |
+| `{ catOrDog { __typename { x } } }` (union) | invalid | **VALID** |
+| `{ pet { __typename { x } } }` (interface) | invalid | **VALID** |
+
+So `__typename`'s leaf-selection check is skipped specifically when it is selected
+on an abstract type (`FieldSelectionsRule` special-cases the `__typename` meta-field).
+
+## Finding 4 — directive *arguments* are not validated on `__typename`
+
+HotChocolate validates a directive's existence and location on `__typename`
+(`@nosuchdir`, `@onQuery` are rejected) and validates directive arguments on
+ordinary fields, but it does **not** validate the *arguments* of directives
+applied to `__typename`:
+
+| query | graphql-js | HotChocolate |
+| --- | --- | --- |
+| `{ dog { __typename @skip } }` (missing required `if`) | invalid | **VALID** |
+| `{ dog { __typename @skip(if: 5) } }` (wrong arg type) | invalid | **VALID** |
+| `{ dog { __typename @skip(wrong: true) } }` (unknown arg) | invalid | **VALID** |
+| `{ dog { name @skip } }` (control: ordinary field) | invalid | invalid |
+
+Holds for `__typename` on every parent kind (object, union, interface, root).
+
+### Root cause
+
+`src/HotChocolate/Core/src/Validation/Rules/ArgumentVisitor.cs:48-64`: the
+`__typename` branch validates the field's own arguments (it has none) and then
+`return Skip`, so the visitor never descends into the field's **directives** and
+their arguments go unvalidated. Ordinary fields fall through to the `Continue`
+branch (line 73), which validates their directive arguments. Fix: validate the
+directive arguments of `__typename` instead of `Skip`-ping past them.
 
 ---
 

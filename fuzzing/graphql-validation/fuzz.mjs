@@ -39,6 +39,10 @@ const BASE = [
   '{ dog @onField { name } }',
   'query Named @onQuery { dog { name } }',
   '{ pet { name ... on Dog { barkVolume } ... on Cat { meowsVolume } } }',
+  '{ catOrDog { ... on Dog { name barkVolume tag } ... on Cat { nickname meowsVolume tag } } }',
+  '{ dogOrHuman { __typename ... on Dog { name } ... on Human { name relatives { name } } } }',
+  '{ pet { name ... on Canine { mother { name } father { name } } } }',
+  '{ catOrDog { __typename ... on Dog { x: name } ... on Cat { x: nickname } } }',
   '{ dog { name @complex(arg: "x") } }',
 ];
 
@@ -99,6 +103,15 @@ const fieldMutators = [
   // variable type changes -> position / coercion mismatches.
   (d) => mutKind(d, Kind.VARIABLE_DEFINITION, (n) => ({ ...n, type: n.type.kind === Kind.NON_NULL_TYPE ? n.type.type : n.type })),
   (d) => mutKind(d, Kind.VARIABLE_DEFINITION, (n) => ({ ...n, type: { kind: Kind.NAMED_TYPE, name: NAME(pick(['String', 'Boolean', 'Float', 'DogCommand', 'ComplexInput'])) } })),
+  // inject an inline fragment with a varied (often impossible / wrong-kind) type condition.
+  (d) => mutKind(d, Kind.SELECTION_SET, (n) => ({
+    ...n,
+    selections: [...n.selections, {
+      kind: Kind.INLINE_FRAGMENT,
+      typeCondition: { kind: Kind.NAMED_TYPE, name: NAME(pick(['Dog', 'Cat', 'Human', 'Pet', 'Mammal', 'Canine', 'CatOrDog', 'DogOrHuman', 'GeoPoint', 'DogCommand', 'ComplexInput', 'NoSuchType'])) },
+      selectionSet: { kind: Kind.SELECTION_SET, selections: [{ kind: Kind.FIELD, name: NAME(pick(['name', 'barkVolume', 'meows', 'tag', 'nickname', '__typename'])) }] },
+    }],
+  })),
 ];
 
 const docMutators = [
