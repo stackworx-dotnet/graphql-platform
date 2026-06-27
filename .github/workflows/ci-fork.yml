@@ -1,0 +1,39 @@
+name: 🍓 Fork CI
+
+# Builds and tests the forked StrawberryShake runtime packages (Razor + Core), including a
+# bUnit smoke test. Scoped to what the fork touches - not the full upstream monorepo matrix.
+# The Razor codegen snapshot tests bake the generator assembly version (0.0.0.0 locally vs the
+# stamped version in CI) so they are not CI-portable and are not run here.
+
+on:
+  pull_request:
+  push:
+    branches:
+      - fork
+      - "release/fork-*"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Build & test forked packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@9a946fdbd5fb07b82b2f5a4466058b876ab72bb2 # v5.3.0
+        with:
+          dotnet-version: |
+            8.x
+            9.x
+            10.x
+            11.0.100-preview.5.26302.115
+
+      - name: Test StrawberryShake.Razor (runtime + bUnit)
+        run: dotnet test src/StrawberryShake/Client/test/Razor.Tests/StrawberryShake.Razor.Tests.csproj -c Release
+
+      - name: Test StrawberryShake.Core
+        run: dotnet test src/StrawberryShake/Client/test/Core.Tests/StrawberryShake.Core.Tests.csproj -c Release
