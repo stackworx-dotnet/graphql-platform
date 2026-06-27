@@ -2,6 +2,8 @@ using HotChocolate.AspNetCore.Tests.Utilities;
 using HotChocolate.StarWars.Models;
 using HotChocolate.Subscriptions;
 using Microsoft.Extensions.DependencyInjection;
+// TestServerHelper lives in the WebSocket test project's namespace; it only hosts the GraphQL
+// server here. This test runs subscriptions over SSE (HTTP), so no WebSocket client is registered.
 using StrawberryShake.Transport.WebSockets;
 using static HotChocolate.StarWars.Types.Subscriptions;
 
@@ -26,9 +28,6 @@ public class StarWarsOnReviewSubGraphQLSSETest : ServerTestBase
         serviceCollection.AddHttpClient(
             StarWarsOnReviewSubGraphQLSSEClient.ClientName,
             c => c.BaseAddress = new Uri("http://localhost:" + port + "/graphql"));
-        serviceCollection.AddWebSocketClient(
-            StarWarsOnReviewSubGraphQLSSEClient.ClientName,
-            c => c.Uri = new Uri("ws://localhost:" + port + "/graphql"));
         serviceCollection.AddStarWarsOnReviewSubGraphQLSSEClient();
         IServiceProvider services = serviceCollection.BuildServiceProvider();
         var client = services.GetRequiredService<StarWarsOnReviewSubGraphQLSSEClient>();
