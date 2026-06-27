@@ -12,6 +12,16 @@ public class HttpConnection : IHttpConnection
     public const string RequestUri = "StrawberryShake.Transport.Http.HttpConnection.RequestUri";
     public const string HttpClient = "StrawberryShake.Transport.Http.HttpConnection.HttpClient";
 
+    // Blazor WASM buffers the entire response body by default, so SSE subscription events only
+    // surface once the connection closes. Setting this per-request option opts into response
+    // streaming so events surface as they arrive. The option is ignored on non-WASM handlers
+    // and is the default on .NET 10+.
+    private static readonly HttpRequestOptionsKey<bool> s_enableWasmResponseStreaming =
+        new("WebAssemblyEnableStreamingResponse");
+
+    private static readonly OnHttpRequestMessageCreated s_enableResponseStreaming =
+        static (_, message, _) => message.Options.Set(s_enableWasmResponseStreaming, true);
+
     private readonly Func<OperationRequest, object?, HttpClient> _createClient;
     private readonly object? _clientFactoryState;
 
@@ -103,7 +113,14 @@ public class HttpConnection : IHttpConnection
             operation = new HotChocolate.Transport.OperationRequest(body, null, name, onError: null, variables, extensions);
         }
 
-        return new GraphQLHttpRequest(operation) { EnableFileUploads = hasFiles };
+        var httpRequest = new GraphQLHttpRequest(operation) { EnableFileUploads = hasFiles };
+
+        if (document.Kind == OperationKind.Subscription)
+        {
+            httpRequest.OnMessageCreated = s_enableResponseStreaming;
+        }
+
+        return httpRequest;
     }
 
     protected virtual Response<JsonDocument> CreateResponse(
