@@ -1,9 +1,11 @@
 # StrawberryShake-only schema extensions. graphql-js never loads this file.
 # @key marks the global entity id field (types with `id` become entities, which
-# is where the richest fragment/entity codegen lives). @serializationType binds the
-# custom DateTime scalar to a CLR type so generation does not fail on it.
+# is where the richest fragment/entity codegen lives).
+#
+# NOTE: the custom DateTime scalar is intentionally left UNbound. StrawberryShake
+# then treats it as a string-backed scalar (runtime + serialization type = string),
+# which generates compiling code. An earlier @serializationType(name: System.DateTime)
+# binding was wrong (the wire value is a string, not a DateTime) and produced a
+# spurious CS1503 in the generated builder; that was a harness artifact, not a finding.
 
 extend schema @key(fields: "id")
-
-extend scalar DateTime
-  @serializationType(name: "global::System.DateTime")

@@ -130,6 +130,18 @@ here first).
 
 ---
 
+## Not a finding — custom-scalar `@serializationType` binding (CS1503)
+
+An early [schema.extensions.graphql](./schema.extensions.graphql) bound the custom
+`DateTime` scalar with `@serializationType(name: "System.DateTime")`. That is wrong:
+`DateTime`'s wire value is a string, so the generated builder passed a `string` where a
+`System.DateTime` was expected, and the output failed to compile with
+`CS1503: Argument 1: cannot convert from 'string' to 'System.DateTime'`. It reproduced
+on a trivial **fragment-free** query (`query Q { me { createdAt } }`), which is what
+flagged it as a harness misconfiguration rather than a StrawberryShake bug. Left as a
+bare (string-backed) scalar, `DateTime` generates compiling code. Excluded from the
+findings (it accounted for the `CS1503` signature seen in the first full run).
+
 ## Related upstream issues (open)
 
 Fragments are already a known weak area; searching `ChilliCream/graphql-platform`

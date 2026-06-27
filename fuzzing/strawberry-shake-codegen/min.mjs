@@ -31,6 +31,15 @@ const probes = [
   ['B7 same frag twice on union member', 'query B7 { pet { ...DF ...DF } } fragment DF on Dog { name }'],
   ['B8 spread twice + inline same type', 'query B8 { me { ...UF ...UF ... on User { email } } } fragment UF on User { id name }'],
 
+  // --- Finding C (CS1503): custom-scalar (DateTime) mismatch under split inline fragments ---
+  ['D1 interface, split inline, DateTime in 2nd', 'query D1 { node(id: "1") { ... on User { name } ... on User { createdAt } } }'],
+  ['D2 interface, single inline, both fields', 'query D2 { node(id: "1") { ... on User { name createdAt } } }'],
+  ['D3 object direct, no fragment', 'query D3 { me { name createdAt } }'],
+  ['D4 object-typed (me), split inline', 'query D4 { me { ... on User { name } ... on User { createdAt } } }'],
+  ['D5 interface, single inline, only DateTime', 'query D5 { node(id: "1") { ... on User { createdAt } } }'],
+  ['D6 interface split, NO custom scalar', 'query D6 { node(id: "1") { ... on User { name } ... on User { email } } }'],
+  ['D7 interface split, both DateTime+other', 'query D7 { node(id: "1") { ... on User { createdAt } ... on User { name } } }'],
+
   // --- controls ---
   ['C1 trivial control', 'query C1 { me { id name } }'],
   ['C2 named fragment once on union', 'query C2 { pet { ...DF } } fragment DF on Dog { name }'],
