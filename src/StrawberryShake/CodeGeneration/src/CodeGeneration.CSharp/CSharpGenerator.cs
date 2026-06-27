@@ -4,6 +4,7 @@ using HotChocolate;
 using HotChocolate.Language;
 using HotChocolate.Validation;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.Extensions.DependencyInjection;
 using StrawberryShake.CodeGeneration.Analyzers;
@@ -262,12 +263,30 @@ public static class CSharpGenerator
         code.AppendLine("#nullable enable annotations");
         code.AppendLine("#nullable disable warnings");
 
-        var compilationUnit = CompilationUnit();
+        code.AppendLine();
+
+        // Each namespace declaration is normalized on its own and the pieces are joined,
+        // rather than normalizing one giant compilation unit of every namespace. Building
+        // that single tree was super-linear in the number of types and dominated generation
+        // for large clients (it was also the out-of-memory source, since it materialized one
+        // huge tree). Normalizing per namespace keeps the cost far lower and never holds the
+        // whole client in a single tree.
+        //
+        // The assembled text is byte-identical to normalizing the whole compilation unit. A
+        // standalone namespace declaration normalizes with no leading or trailing trivia, and
+        // the whole-tree normalizer separates the top-level namespace members with a blank
+        // line (one line ending to close the previous namespace's brace, then one blank
+        // line), so we reproduce exactly that separator between namespaces. Normalizing each
+        // namespace as a real subtree (rather than re-indenting per-type text) preserves the
+        // normalizer's own handling of nested constructs such as preprocessor directives.
+        var firstNamespace = true;
 
         foreach (var group in results.GroupBy(t => t.Result.Namespace).OrderBy(t => t.Key))
         {
             var namespaceDeclaration =
                 NamespaceDeclaration(IdentifierName(group.Key));
+
+            var members = new List<MemberDeclarationSyntax>();
 
             foreach (var item in group)
             {
@@ -279,16 +298,37 @@ public static class CSharpGenerator
 
                 typeDeclaration = typeDeclaration.WithLeadingTrivia(trivia);
 #endif
-                namespaceDeclaration = namespaceDeclaration.AddMembers(typeDeclaration);
+                members.Add(typeDeclaration);
             }
 
-            compilationUnit = compilationUnit.AddMembers(namespaceDeclaration);
+            // Adding the members one at a time copies the growing member list on every call,
+            // which is quadratic for namespaces with tens of thousands of types. Setting the
+            // whole list once keeps namespace construction linear.
+            namespaceDeclaration = namespaceDeclaration.WithMembers(List(members));
+
+            var normalized = namespaceDeclaration
+                .NormalizeWhitespace(elasticTrivia: true)
+                .ToFullString();
+
+            if (firstNamespace)
+            {
+                firstNamespace = false;
+            }
+            else
+            {
+                code.Append("\r\n\r\n");
+            }
+
+            code.Append(normalized);
         }
 
-        compilationUnit = compilationUnit.NormalizeWhitespace(elasticTrivia: true);
-
-        code.AppendLine();
-        code.AppendLine(compilationUnit.ToFullString());
+        // The original whole-tree path appended a trailing line ending after the compilation
+        // unit (AppendLine of ToFullString()). Preserve it so the emitted text stays
+        // byte-identical.
+        if (!firstNamespace)
+        {
+            code.Append(Environment.NewLine);
+        }
 
         documents.Add(
             new(
