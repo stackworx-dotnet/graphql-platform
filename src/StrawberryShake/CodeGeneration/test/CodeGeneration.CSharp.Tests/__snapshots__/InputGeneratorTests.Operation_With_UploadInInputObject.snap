@@ -293,7 +293,7 @@ namespace Foo.Bar
         {
             var pathFoo = path + ".foo";
             var valueFoo = value.Foo;
-            files.Add(pathFoo, valueFoo is global::StrawberryShake.Upload u ? u : null);
+            files.Add(pathFoo, valueFoo is global::StrawberryShake.Upload valueFoo_i ? valueFoo_i : null);
         }
 
         private void MapFilesFromArgumentInput(global::System.String path, global::Foo.Bar.Test value, global::System.Collections.Generic.Dictionary<global::System.String, global::StrawberryShake.Upload?> files)

@@ -787,7 +787,7 @@ namespace Foo.Bar
         {
             var pathProfilePicture = path + ".profilePicture";
             var valueProfilePicture = value.ProfilePicture;
-            files.Add(pathProfilePicture, valueProfilePicture is global::StrawberryShake.Upload u ? u : null);
+            files.Add(pathProfilePicture, valueProfilePicture is global::StrawberryShake.Upload valueProfilePicture_i ? valueProfilePicture_i : null);
             var pathPhotos = path + ".photos";
             var valuePhotos = value.Photos;
             if (valuePhotos is { } valuePhotos_i)
@@ -808,7 +808,7 @@ namespace Foo.Bar
         {
             var pathData = path + ".data";
             var valueData = value.Data;
-            files.Add(pathData, valueData is global::StrawberryShake.Upload u ? u : null);
+            files.Add(pathData, valueData is global::StrawberryShake.Upload valueData_i ? valueData_i : null);
             var pathMetadata = path + ".metadata";
             var valueMetadata = value.Metadata;
             if (valueMetadata is { } valueMetadata_i)
@@ -821,7 +821,7 @@ namespace Foo.Bar
         {
             var pathThumbnail = path + ".thumbnail";
             var valueThumbnail = value.Thumbnail;
-            files.Add(pathThumbnail, valueThumbnail is global::StrawberryShake.Upload u ? u : null);
+            files.Add(pathThumbnail, valueThumbnail is global::StrawberryShake.Upload valueThumbnail_i ? valueThumbnail_i : null);
         }
 
         private void MapFilesFromArgumentInput(global::System.String path, global::Foo.Bar.User value, global::System.Collections.Generic.Dictionary<global::System.String, global::StrawberryShake.Upload?> files)

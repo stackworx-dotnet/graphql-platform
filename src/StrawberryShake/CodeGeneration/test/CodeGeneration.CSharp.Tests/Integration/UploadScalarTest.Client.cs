@@ -681,7 +681,7 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.UploadScalar
 
         private void MapFilesFromArgumentSingle(global::System.String path, global::StrawberryShake.Upload? value, global::System.Collections.Generic.Dictionary<global::System.String, global::StrawberryShake.Upload?> files)
         {
-            files.Add(path, value is global::StrawberryShake.Upload u ? u : null);
+            files.Add(path, value is global::StrawberryShake.Upload value_i ? value_i : null);
         }
 
         private void MapFilesFromArgumentList(global::System.String path, global::System.Collections.Generic.IReadOnlyList<global::StrawberryShake.Upload?>? value, global::System.Collections.Generic.Dictionary<global::System.String, global::StrawberryShake.Upload?> files)
@@ -692,7 +692,7 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.UploadScalar
                 foreach (var value_lt in value_i)
                 {
                     var path_lt = path + "." + (path_counter++);
-                    files.Add(path_lt, value_lt is global::StrawberryShake.Upload u ? u : null);
+                    files.Add(path_lt, value_lt is global::StrawberryShake.Upload value_lt_i ? value_lt_i : null);
                 }
             }
         }
@@ -711,7 +711,7 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.UploadScalar
                         foreach (var value_lt_lt in value_lt_i)
                         {
                             var path_lt_lt = path_lt + "." + (path_lt_counter++);
-                            files.Add(path_lt_lt, value_lt_lt is global::StrawberryShake.Upload u ? u : null);
+                            files.Add(path_lt_lt, value_lt_lt is global::StrawberryShake.Upload value_lt_lt_i ? value_lt_lt_i : null);
                         }
                     }
                 }
@@ -742,7 +742,7 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.UploadScalar
         {
             var pathFile = path + ".file";
             var valueFile = value.File;
-            files.Add(pathFile, valueFile is global::StrawberryShake.Upload u ? u : null);
+            files.Add(pathFile, valueFile is global::StrawberryShake.Upload valueFile_i ? valueFile_i : null);
         }
 
         private void MapFilesFromArgumentObject(global::System.String path, global::StrawberryShake.CodeGeneration.CSharp.Integration.UploadScalar.TestInput? value, global::System.Collections.Generic.Dictionary<global::System.String, global::StrawberryShake.Upload?> files)

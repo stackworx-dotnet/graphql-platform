@@ -584,10 +584,7 @@ public class OperationServiceGenerator : ClassBaseGenerator<OperationDescriptor>
         {
             if (argument.Type.NamedType() is InputObjectTypeDescriptor { HasUpload: true } type)
             {
-                if (processed.Add(argument.Type.NamedType().Name))
-                {
-                    AddMapFilesOfInputTypeMethod(classBuilder, type);
-                }
+                AddMapFilesOfInputTypeMethod(classBuilder, type, processed);
             }
             else if (argument.Type.NamedType() is not ScalarTypeDescriptor { Name: "Upload" })
             {
@@ -605,9 +602,10 @@ public class OperationServiceGenerator : ClassBaseGenerator<OperationDescriptor>
 
     private static void AddMapFilesOfInputTypeMethod(
         ClassBuilder builder,
-        InputObjectTypeDescriptor type)
+        InputObjectTypeDescriptor type,
+        HashSet<string> processed)
     {
-        if (!type.HasUpload)
+        if (!type.HasUpload || !processed.Add(type.Name))
         {
             return;
         }
@@ -642,7 +640,7 @@ public class OperationServiceGenerator : ClassBaseGenerator<OperationDescriptor>
 
             if (field.Type.NamedType() is InputObjectTypeDescriptor nextType)
             {
-                AddMapFilesOfInputTypeMethod(builder, nextType);
+                AddMapFilesOfInputTypeMethod(builder, nextType, processed);
             }
         }
     }
@@ -700,7 +698,9 @@ public class OperationServiceGenerator : ClassBaseGenerator<OperationDescriptor>
                             .New()
                             .SetMethodName(Files, "Add")
                             .AddArgument(pathVariable)
-                            .AddArgument($"{variable} is {TypeNames.Upload} u ? u : null"));
+                            .AddArgument(
+                                $"{variable} is {TypeNames.Upload} {checkedVariable} "
+                                + $"? {checkedVariable} : null"));
 
             default:
                 throw ThrowHelper.OperationServiceGenerator_HasNoUploadScalar(typeReference);

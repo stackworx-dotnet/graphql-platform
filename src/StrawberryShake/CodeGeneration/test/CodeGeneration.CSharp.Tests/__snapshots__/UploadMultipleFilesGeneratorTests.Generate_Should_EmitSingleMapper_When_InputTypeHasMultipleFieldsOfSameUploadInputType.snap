@@ -21,16 +21,16 @@ namespace Foo.Bar
 {
     // StrawberryShake.CodeGeneration.CSharp.Generators.ResultTypeGenerator
     [global::System.CodeDom.Compiler.GeneratedCode("StrawberryShake", "11.0.0")]
-    public partial class Test_1Result : global::System.IEquatable<Test_1Result>, ITestResult
+    public partial class TestResult : global::System.IEquatable<TestResult>, ITestResult
     {
-        public Test_1Result(global::System.String? foo)
+        public TestResult(global::System.String? upload)
         {
-            Foo = foo;
+            Upload = upload;
         }
 
-        public global::System.String? Foo { get; }
+        public global::System.String? Upload { get; }
 
-        public virtual global::System.Boolean Equals(Test_1Result? other)
+        public virtual global::System.Boolean Equals(TestResult? other)
         {
             if (ReferenceEquals(null, other))
             {
@@ -47,7 +47,7 @@ namespace Foo.Bar
                 return false;
             }
 
-            return (((Foo is null && other.Foo is null) || Foo != null && Foo.Equals(other.Foo)));
+            return (((Upload is null && other.Upload is null) || Upload != null && Upload.Equals(other.Upload)));
         }
 
         public override global::System.Boolean Equals(global::System.Object? obj)
@@ -67,7 +67,7 @@ namespace Foo.Bar
                 return false;
             }
 
-            return Equals((Test_1Result)obj);
+            return Equals((TestResult)obj);
         }
 
         public override global::System.Int32 GetHashCode()
@@ -75,9 +75,9 @@ namespace Foo.Bar
             unchecked
             {
                 int hash = 5;
-                if (Foo != null)
+                if (Upload != null)
                 {
-                    hash ^= 397 * Foo.GetHashCode();
+                    hash ^= 397 * Upload.GetHashCode();
                 }
 
                 return hash;
@@ -89,19 +89,21 @@ namespace Foo.Bar
     [global::System.CodeDom.Compiler.GeneratedCode("StrawberryShake", "11.0.0")]
     public partial interface ITestResult
     {
-        public global::System.String? Foo { get; }
+        public global::System.String? Upload { get; }
     }
 
     // StrawberryShake.CodeGeneration.CSharp.Generators.InputValueFormatterGenerator
     [global::System.CodeDom.Compiler.GeneratedCode("StrawberryShake", "11.0.0")]
-    public partial class TestInputValueFormatter : global::StrawberryShake.Serialization.IInputObjectFormatter
+    public partial class CreateTaskInputInputValueFormatter : global::StrawberryShake.Serialization.IInputObjectFormatter
     {
-        private global::StrawberryShake.Serialization.IInputValueFormatter _barFormatter = default !;
-        public global::System.String TypeName => "Test";
+        private global::StrawberryShake.Serialization.IInputValueFormatter _stringFormatter = default !;
+        private global::StrawberryShake.Serialization.IInputValueFormatter _fileUploadFormatter = default !;
+        public global::System.String TypeName => "CreateTaskInput";
 
         public void Initialize(global::StrawberryShake.Serialization.ISerializerResolver serializerResolver)
         {
-            _barFormatter = serializerResolver.GetInputValueFormatter("Bar");
+            _stringFormatter = serializerResolver.GetInputValueFormatter("String");
+            _fileUploadFormatter = serializerResolver.GetInputValueFormatter("FileUpload");
         }
 
         public global::System.Object? Format(global::System.Object? runtimeValue)
@@ -111,36 +113,72 @@ namespace Foo.Bar
                 return null;
             }
 
-            var input = runtimeValue as global::Foo.Bar.Test;
-            var inputInfo = runtimeValue as global::Foo.Bar.State.ITestInfo;
+            var input = runtimeValue as global::Foo.Bar.CreateTaskInput;
+            var inputInfo = runtimeValue as global::Foo.Bar.State.ICreateTaskInputInfo;
             if (input is null || inputInfo is null)
             {
                 throw new global::System.ArgumentException(nameof(runtimeValue));
             }
 
             var fields = new global::System.Collections.Generic.List<global::System.Collections.Generic.KeyValuePair<global::System.String, global::System.Object?>>();
-            if (inputInfo.IsFooSet)
+            if (inputInfo.IsTitleSet)
             {
-                fields.Add(new global::System.Collections.Generic.KeyValuePair<global::System.String, global::System.Object?>("foo", FormatFoo(input.Foo)));
+                fields.Add(new global::System.Collections.Generic.KeyValuePair<global::System.String, global::System.Object?>("title", FormatTitle(input.Title)));
+            }
+
+            if (inputInfo.IsUploadOneSet)
+            {
+                fields.Add(new global::System.Collections.Generic.KeyValuePair<global::System.String, global::System.Object?>("uploadOne", FormatUploadOne(input.UploadOne)));
+            }
+
+            if (inputInfo.IsUploadTwoSet)
+            {
+                fields.Add(new global::System.Collections.Generic.KeyValuePair<global::System.String, global::System.Object?>("uploadTwo", FormatUploadTwo(input.UploadTwo)));
             }
 
             return fields;
         }
 
-        private global::System.Object? FormatFoo(global::Foo.Bar.Bar input)
+        private global::System.Object? FormatTitle(global::System.String? input)
         {
             if (input is null)
             {
-                throw new global::System.ArgumentNullException(nameof(input));
+                return input;
             }
+            else
+            {
+                return _stringFormatter.Format(input);
+            }
+        }
 
-            return _barFormatter.Format(input);
+        private global::System.Object? FormatUploadOne(global::Foo.Bar.FileUpload? input)
+        {
+            if (input is null)
+            {
+                return input;
+            }
+            else
+            {
+                return _fileUploadFormatter.Format(input);
+            }
+        }
+
+        private global::System.Object? FormatUploadTwo(global::Foo.Bar.FileUpload? input)
+        {
+            if (input is null)
+            {
+                return input;
+            }
+            else
+            {
+                return _fileUploadFormatter.Format(input);
+            }
         }
     }
 
     // StrawberryShake.CodeGeneration.CSharp.Generators.InputTypeGenerator
     [global::System.CodeDom.Compiler.GeneratedCode("StrawberryShake", "0.0.0.0")]
-    public partial class Test : global::Foo.Bar.State.ITestInfo, global::System.IEquatable<Test>
+    public partial class CreateTaskInput : global::Foo.Bar.State.ICreateTaskInputInfo, global::System.IEquatable<CreateTaskInput>
     {
         public override global::System.Boolean Equals(global::System.Object? obj)
         {
@@ -159,10 +197,10 @@ namespace Foo.Bar
                 return false;
             }
 
-            return Equals((Test)obj);
+            return Equals((CreateTaskInput)obj);
         }
 
-        public virtual global::System.Boolean Equals(Test? other)
+        public virtual global::System.Boolean Equals(CreateTaskInput? other)
         {
             if (ReferenceEquals(null, other))
             {
@@ -179,7 +217,7 @@ namespace Foo.Bar
                 return false;
             }
 
-            return (Foo.Equals(other.Foo));
+            return (((Title is null && other.Title is null) || Title != null && Title.Equals(other.Title))) && ((UploadOne is null && other.UploadOne is null) || UploadOne != null && UploadOne.Equals(other.UploadOne)) && ((UploadTwo is null && other.UploadTwo is null) || UploadTwo != null && UploadTwo.Equals(other.UploadTwo));
         }
 
         public override global::System.Int32 GetHashCode()
@@ -187,265 +225,79 @@ namespace Foo.Bar
             unchecked
             {
                 int hash = 5;
-                hash ^= 397 * Foo.GetHashCode();
+                if (Title != null)
+                {
+                    hash ^= 397 * Title.GetHashCode();
+                }
+
+                if (UploadOne != null)
+                {
+                    hash ^= 397 * UploadOne.GetHashCode();
+                }
+
+                if (UploadTwo != null)
+                {
+                    hash ^= 397 * UploadTwo.GetHashCode();
+                }
+
                 return hash;
             }
         }
 
-        private global::Foo.Bar.Bar _value_foo = default !;
-        private global::System.Boolean _set_foo;
-        public global::Foo.Bar.Bar Foo
+        private global::System.String? _value_title;
+        private global::System.Boolean _set_title;
+        private global::Foo.Bar.FileUpload? _value_uploadOne;
+        private global::System.Boolean _set_uploadOne;
+        private global::Foo.Bar.FileUpload? _value_uploadTwo;
+        private global::System.Boolean _set_uploadTwo;
+        public global::System.String? Title
         {
-            get => _value_foo;
+            get => _value_title;
             set
             {
-                _set_foo = true;
-                _value_foo = value;
+                _set_title = true;
+                _value_title = value;
             }
         }
 
-        global::System.Boolean global::Foo.Bar.State.ITestInfo.IsFooSet => _set_foo;
+        global::System.Boolean global::Foo.Bar.State.ICreateTaskInputInfo.IsTitleSet => _set_title;
+
+        public global::Foo.Bar.FileUpload? UploadOne
+        {
+            get => _value_uploadOne;
+            set
+            {
+                _set_uploadOne = true;
+                _value_uploadOne = value;
+            }
+        }
+
+        global::System.Boolean global::Foo.Bar.State.ICreateTaskInputInfo.IsUploadOneSet => _set_uploadOne;
+
+        public global::Foo.Bar.FileUpload? UploadTwo
+        {
+            get => _value_uploadTwo;
+            set
+            {
+                _set_uploadTwo = true;
+                _value_uploadTwo = value;
+            }
+        }
+
+        global::System.Boolean global::Foo.Bar.State.ICreateTaskInputInfo.IsUploadTwoSet => _set_uploadTwo;
     }
 
     // StrawberryShake.CodeGeneration.CSharp.Generators.InputValueFormatterGenerator
     [global::System.CodeDom.Compiler.GeneratedCode("StrawberryShake", "11.0.0")]
-    public partial class BarInputValueFormatter : global::StrawberryShake.Serialization.IInputObjectFormatter
+    public partial class FileUploadInputValueFormatter : global::StrawberryShake.Serialization.IInputObjectFormatter
     {
-        private global::StrawberryShake.Serialization.IInputValueFormatter _bazFormatter = default !;
-        public global::System.String TypeName => "Bar";
-
-        public void Initialize(global::StrawberryShake.Serialization.ISerializerResolver serializerResolver)
-        {
-            _bazFormatter = serializerResolver.GetInputValueFormatter("Baz");
-        }
-
-        public global::System.Object? Format(global::System.Object? runtimeValue)
-        {
-            if (runtimeValue is null)
-            {
-                return null;
-            }
-
-            var input = runtimeValue as global::Foo.Bar.Bar;
-            var inputInfo = runtimeValue as global::Foo.Bar.State.IBarInfo;
-            if (input is null || inputInfo is null)
-            {
-                throw new global::System.ArgumentException(nameof(runtimeValue));
-            }
-
-            var fields = new global::System.Collections.Generic.List<global::System.Collections.Generic.KeyValuePair<global::System.String, global::System.Object?>>();
-            if (inputInfo.IsFooSet)
-            {
-                fields.Add(new global::System.Collections.Generic.KeyValuePair<global::System.String, global::System.Object?>("foo", FormatFoo(input.Foo)));
-            }
-
-            return fields;
-        }
-
-        private global::System.Object? FormatFoo(global::Foo.Bar.Baz input)
-        {
-            if (input is null)
-            {
-                throw new global::System.ArgumentNullException(nameof(input));
-            }
-
-            return _bazFormatter.Format(input);
-        }
-    }
-
-    // StrawberryShake.CodeGeneration.CSharp.Generators.InputTypeGenerator
-    [global::System.CodeDom.Compiler.GeneratedCode("StrawberryShake", "0.0.0.0")]
-    public partial class Bar : global::Foo.Bar.State.IBarInfo, global::System.IEquatable<Bar>
-    {
-        public override global::System.Boolean Equals(global::System.Object? obj)
-        {
-            if (ReferenceEquals(null, obj))
-            {
-                return false;
-            }
-
-            if (ReferenceEquals(this, obj))
-            {
-                return true;
-            }
-
-            if (obj.GetType() != GetType())
-            {
-                return false;
-            }
-
-            return Equals((Bar)obj);
-        }
-
-        public virtual global::System.Boolean Equals(Bar? other)
-        {
-            if (ReferenceEquals(null, other))
-            {
-                return false;
-            }
-
-            if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
-
-            if (other.GetType() != GetType())
-            {
-                return false;
-            }
-
-            return (Foo.Equals(other.Foo));
-        }
-
-        public override global::System.Int32 GetHashCode()
-        {
-            unchecked
-            {
-                int hash = 5;
-                hash ^= 397 * Foo.GetHashCode();
-                return hash;
-            }
-        }
-
-        private global::Foo.Bar.Baz _value_foo = default !;
-        private global::System.Boolean _set_foo;
-        public global::Foo.Bar.Baz Foo
-        {
-            get => _value_foo;
-            set
-            {
-                _set_foo = true;
-                _value_foo = value;
-            }
-        }
-
-        global::System.Boolean global::Foo.Bar.State.IBarInfo.IsFooSet => _set_foo;
-    }
-
-    // StrawberryShake.CodeGeneration.CSharp.Generators.InputValueFormatterGenerator
-    [global::System.CodeDom.Compiler.GeneratedCode("StrawberryShake", "11.0.0")]
-    public partial class BazInputValueFormatter : global::StrawberryShake.Serialization.IInputObjectFormatter
-    {
-        private global::StrawberryShake.Serialization.IInputValueFormatter _quxFormatter = default !;
-        public global::System.String TypeName => "Baz";
-
-        public void Initialize(global::StrawberryShake.Serialization.ISerializerResolver serializerResolver)
-        {
-            _quxFormatter = serializerResolver.GetInputValueFormatter("Qux");
-        }
-
-        public global::System.Object? Format(global::System.Object? runtimeValue)
-        {
-            if (runtimeValue is null)
-            {
-                return null;
-            }
-
-            var input = runtimeValue as global::Foo.Bar.Baz;
-            var inputInfo = runtimeValue as global::Foo.Bar.State.IBazInfo;
-            if (input is null || inputInfo is null)
-            {
-                throw new global::System.ArgumentException(nameof(runtimeValue));
-            }
-
-            var fields = new global::System.Collections.Generic.List<global::System.Collections.Generic.KeyValuePair<global::System.String, global::System.Object?>>();
-            if (inputInfo.IsFooSet)
-            {
-                fields.Add(new global::System.Collections.Generic.KeyValuePair<global::System.String, global::System.Object?>("foo", FormatFoo(input.Foo)));
-            }
-
-            return fields;
-        }
-
-        private global::System.Object? FormatFoo(global::Foo.Bar.Qux input)
-        {
-            if (input is null)
-            {
-                throw new global::System.ArgumentNullException(nameof(input));
-            }
-
-            return _quxFormatter.Format(input);
-        }
-    }
-
-    // StrawberryShake.CodeGeneration.CSharp.Generators.InputTypeGenerator
-    [global::System.CodeDom.Compiler.GeneratedCode("StrawberryShake", "0.0.0.0")]
-    public partial class Baz : global::Foo.Bar.State.IBazInfo, global::System.IEquatable<Baz>
-    {
-        public override global::System.Boolean Equals(global::System.Object? obj)
-        {
-            if (ReferenceEquals(null, obj))
-            {
-                return false;
-            }
-
-            if (ReferenceEquals(this, obj))
-            {
-                return true;
-            }
-
-            if (obj.GetType() != GetType())
-            {
-                return false;
-            }
-
-            return Equals((Baz)obj);
-        }
-
-        public virtual global::System.Boolean Equals(Baz? other)
-        {
-            if (ReferenceEquals(null, other))
-            {
-                return false;
-            }
-
-            if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
-
-            if (other.GetType() != GetType())
-            {
-                return false;
-            }
-
-            return (Foo.Equals(other.Foo));
-        }
-
-        public override global::System.Int32 GetHashCode()
-        {
-            unchecked
-            {
-                int hash = 5;
-                hash ^= 397 * Foo.GetHashCode();
-                return hash;
-            }
-        }
-
-        private global::Foo.Bar.Qux _value_foo = default !;
-        private global::System.Boolean _set_foo;
-        public global::Foo.Bar.Qux Foo
-        {
-            get => _value_foo;
-            set
-            {
-                _set_foo = true;
-                _value_foo = value;
-            }
-        }
-
-        global::System.Boolean global::Foo.Bar.State.IBazInfo.IsFooSet => _set_foo;
-    }
-
-    // StrawberryShake.CodeGeneration.CSharp.Generators.InputValueFormatterGenerator
-    [global::System.CodeDom.Compiler.GeneratedCode("StrawberryShake", "11.0.0")]
-    public partial class QuxInputValueFormatter : global::StrawberryShake.Serialization.IInputObjectFormatter
-    {
+        private global::StrawberryShake.Serialization.IInputValueFormatter _stringFormatter = default !;
         private global::StrawberryShake.Serialization.IInputValueFormatter _uploadFormatter = default !;
-        public global::System.String TypeName => "Qux";
+        public global::System.String TypeName => "FileUpload";
 
         public void Initialize(global::StrawberryShake.Serialization.ISerializerResolver serializerResolver)
         {
+            _stringFormatter = serializerResolver.GetInputValueFormatter("String");
             _uploadFormatter = serializerResolver.GetInputValueFormatter("Upload");
         }
 
@@ -456,31 +308,70 @@ namespace Foo.Bar
                 return null;
             }
 
-            var input = runtimeValue as global::Foo.Bar.Qux;
-            var inputInfo = runtimeValue as global::Foo.Bar.State.IQuxInfo;
+            var input = runtimeValue as global::Foo.Bar.FileUpload;
+            var inputInfo = runtimeValue as global::Foo.Bar.State.IFileUploadInfo;
             if (input is null || inputInfo is null)
             {
                 throw new global::System.ArgumentException(nameof(runtimeValue));
             }
 
             var fields = new global::System.Collections.Generic.List<global::System.Collections.Generic.KeyValuePair<global::System.String, global::System.Object?>>();
-            if (inputInfo.IsFooSet)
+            if (inputInfo.IsMetadataSet)
             {
-                fields.Add(new global::System.Collections.Generic.KeyValuePair<global::System.String, global::System.Object?>("foo", FormatFoo(input.Foo)));
+                fields.Add(new global::System.Collections.Generic.KeyValuePair<global::System.String, global::System.Object?>("metadata", FormatMetadata(input.Metadata)));
+            }
+
+            if (inputInfo.IsFileSet)
+            {
+                fields.Add(new global::System.Collections.Generic.KeyValuePair<global::System.String, global::System.Object?>("file", FormatFile(input.File)));
+            }
+
+            if (inputInfo.IsFile2Set)
+            {
+                fields.Add(new global::System.Collections.Generic.KeyValuePair<global::System.String, global::System.Object?>("file2", FormatFile2(input.File2)));
             }
 
             return fields;
         }
 
-        private global::System.Object? FormatFoo(global::StrawberryShake.Upload input)
+        private global::System.Object? FormatMetadata(global::System.String input)
         {
-            return _uploadFormatter.Format(input);
+            if (input is null)
+            {
+                throw new global::System.ArgumentNullException(nameof(input));
+            }
+
+            return _stringFormatter.Format(input);
+        }
+
+        private global::System.Object? FormatFile(global::StrawberryShake.Upload? input)
+        {
+            if (input is null)
+            {
+                return input;
+            }
+            else
+            {
+                return _uploadFormatter.Format(input);
+            }
+        }
+
+        private global::System.Object? FormatFile2(global::StrawberryShake.Upload? input)
+        {
+            if (input is null)
+            {
+                return input;
+            }
+            else
+            {
+                return _uploadFormatter.Format(input);
+            }
         }
     }
 
     // StrawberryShake.CodeGeneration.CSharp.Generators.InputTypeGenerator
     [global::System.CodeDom.Compiler.GeneratedCode("StrawberryShake", "0.0.0.0")]
-    public partial class Qux : global::Foo.Bar.State.IQuxInfo, global::System.IEquatable<Qux>
+    public partial class FileUpload : global::Foo.Bar.State.IFileUploadInfo, global::System.IEquatable<FileUpload>
     {
         public override global::System.Boolean Equals(global::System.Object? obj)
         {
@@ -499,10 +390,10 @@ namespace Foo.Bar
                 return false;
             }
 
-            return Equals((Qux)obj);
+            return Equals((FileUpload)obj);
         }
 
-        public virtual global::System.Boolean Equals(Qux? other)
+        public virtual global::System.Boolean Equals(FileUpload? other)
         {
             if (ReferenceEquals(null, other))
             {
@@ -519,7 +410,7 @@ namespace Foo.Bar
                 return false;
             }
 
-            return (Foo.Equals(other.Foo));
+            return (Metadata.Equals(other.Metadata)) && ((File is null && other.File is null) || File != null && File.Equals(other.File)) && ((File2 is null && other.File2 is null) || File2 != null && File2.Equals(other.File2));
         }
 
         public override global::System.Int32 GetHashCode()
@@ -527,32 +418,70 @@ namespace Foo.Bar
             unchecked
             {
                 int hash = 5;
-                hash ^= 397 * Foo.GetHashCode();
+                hash ^= 397 * Metadata.GetHashCode();
+                if (File != null)
+                {
+                    hash ^= 397 * File.GetHashCode();
+                }
+
+                if (File2 != null)
+                {
+                    hash ^= 397 * File2.GetHashCode();
+                }
+
                 return hash;
             }
         }
 
-        private global::StrawberryShake.Upload _value_foo;
-        private global::System.Boolean _set_foo;
-        public global::StrawberryShake.Upload Foo
+        private global::System.String _value_metadata = default !;
+        private global::System.Boolean _set_metadata;
+        private global::StrawberryShake.Upload? _value_file;
+        private global::System.Boolean _set_file;
+        private global::StrawberryShake.Upload? _value_file2;
+        private global::System.Boolean _set_file2;
+        public global::System.String Metadata
         {
-            get => _value_foo;
+            get => _value_metadata;
             set
             {
-                _set_foo = true;
-                _value_foo = value;
+                _set_metadata = true;
+                _value_metadata = value;
             }
         }
 
-        global::System.Boolean global::Foo.Bar.State.IQuxInfo.IsFooSet => _set_foo;
+        global::System.Boolean global::Foo.Bar.State.IFileUploadInfo.IsMetadataSet => _set_metadata;
+
+        public global::StrawberryShake.Upload? File
+        {
+            get => _value_file;
+            set
+            {
+                _set_file = true;
+                _value_file = value;
+            }
+        }
+
+        global::System.Boolean global::Foo.Bar.State.IFileUploadInfo.IsFileSet => _set_file;
+
+        public global::StrawberryShake.Upload? File2
+        {
+            get => _value_file2;
+            set
+            {
+                _set_file2 = true;
+                _value_file2 = value;
+            }
+        }
+
+        global::System.Boolean global::Foo.Bar.State.IFileUploadInfo.IsFile2Set => _set_file2;
     }
 
     // StrawberryShake.CodeGeneration.CSharp.Generators.OperationDocumentGenerator
     /// <summary>
     /// Represents the operation service of the Test GraphQL operation
     /// <code>
-    /// query Test($input: Test!) {
-    ///   foo(input: $input)
+    /// query Test($input: CreateTaskInput!) {
+    ///   upload(input: $input)
     /// }
     /// </code>
     /// </summary>
@@ -565,8 +494,8 @@ namespace Foo.Bar
 
         public static TestQueryDocument Instance { get; } = new TestQueryDocument();
         public global::StrawberryShake.OperationKind Kind => global::StrawberryShake.OperationKind.Query;
-        public global::System.ReadOnlySpan<global::System.Byte> Body => "query Test($input: Test!) { foo(input: $input) }"u8;
-        public global::StrawberryShake.DocumentHash Hash { get; } = new global::StrawberryShake.DocumentHash("sha1Hash", "752fe96425b2cd20ad0beb97fb2d8ebe909c0ace");
+        public global::System.ReadOnlySpan<global::System.Byte> Body => "query Test($input: CreateTaskInput!) { upload(input: $input) }"u8;
+        public global::StrawberryShake.DocumentHash Hash { get; } = new global::StrawberryShake.DocumentHash("sha1Hash", "bfaadbd1e2d1ca65b95f012233915e01b3b5c185");
 
         public override global::System.String ToString()
         {
@@ -582,8 +511,8 @@ namespace Foo.Bar
     /// <summary>
     /// Represents the operation service of the Test GraphQL operation
     /// <code>
-    /// query Test($input: Test!) {
-    ///   foo(input: $input)
+    /// query Test($input: CreateTaskInput!) {
+    ///   upload(input: $input)
     /// }
     /// </code>
     /// </summary>
@@ -591,26 +520,26 @@ namespace Foo.Bar
     public partial class TestQuery : global::Foo.Bar.ITestQuery
     {
         private readonly global::StrawberryShake.IOperationExecutor<ITestResult> _operationExecutor;
-        private readonly global::StrawberryShake.Serialization.IInputValueFormatter _testFormatter;
+        private readonly global::StrawberryShake.Serialization.IInputValueFormatter _createTaskInputFormatter;
         private readonly global::System.Collections.Immutable.ImmutableArray<global::System.Action<global::StrawberryShake.OperationRequest>> _configure = global::System.Collections.Immutable.ImmutableArray<global::System.Action<global::StrawberryShake.OperationRequest>>.Empty;
         public TestQuery(global::StrawberryShake.IOperationExecutor<ITestResult> operationExecutor, global::StrawberryShake.Serialization.ISerializerResolver serializerResolver)
         {
             _operationExecutor = operationExecutor ?? throw new global::System.ArgumentNullException(nameof(operationExecutor));
-            _testFormatter = serializerResolver.GetInputValueFormatter("Test");
+            _createTaskInputFormatter = serializerResolver.GetInputValueFormatter("CreateTaskInput");
         }
 
-        private TestQuery(global::StrawberryShake.IOperationExecutor<ITestResult> operationExecutor, global::System.Collections.Immutable.ImmutableArray<global::System.Action<global::StrawberryShake.OperationRequest>> configure, global::StrawberryShake.Serialization.IInputValueFormatter testFormatter)
+        private TestQuery(global::StrawberryShake.IOperationExecutor<ITestResult> operationExecutor, global::System.Collections.Immutable.ImmutableArray<global::System.Action<global::StrawberryShake.OperationRequest>> configure, global::StrawberryShake.Serialization.IInputValueFormatter createTaskInputFormatter)
         {
             _operationExecutor = operationExecutor;
             _configure = configure;
-            _testFormatter = testFormatter;
+            _createTaskInputFormatter = createTaskInputFormatter;
         }
 
         global::System.Type global::StrawberryShake.IOperationRequestFactory.ResultType => typeof(ITestResult);
 
         public global::Foo.Bar.ITestQuery With(global::System.Action<global::StrawberryShake.OperationRequest> configure)
         {
-            return new global::Foo.Bar.TestQuery(_operationExecutor, _configure.Add(configure), _testFormatter);
+            return new global::Foo.Bar.TestQuery(_operationExecutor, _configure.Add(configure), _createTaskInputFormatter);
         }
 
         public global::Foo.Bar.ITestQuery WithRequestUri(global::System.Uri requestUri)
@@ -623,7 +552,7 @@ namespace Foo.Bar
             return With(r => r.ContextData["StrawberryShake.Transport.Http.HttpConnection.HttpClient"] = httpClient);
         }
 
-        public async global::System.Threading.Tasks.Task<global::StrawberryShake.IOperationResult<ITestResult>> ExecuteAsync(global::Foo.Bar.Test input, global::System.Threading.CancellationToken cancellationToken = default)
+        public async global::System.Threading.Tasks.Task<global::StrawberryShake.IOperationResult<ITestResult>> ExecuteAsync(global::Foo.Bar.CreateTaskInput input, global::System.Threading.CancellationToken cancellationToken = default)
         {
             var request = CreateRequest(input);
             foreach (var configure in _configure)
@@ -634,58 +563,48 @@ namespace Foo.Bar
             return await _operationExecutor.ExecuteAsync(request, cancellationToken).ConfigureAwait(false);
         }
 
-        private void MapFilesFromTypeTest(global::System.String path, global::Foo.Bar.Test value, global::System.Collections.Generic.Dictionary<global::System.String, global::StrawberryShake.Upload?> files)
+        private void MapFilesFromTypeCreateTaskInput(global::System.String path, global::Foo.Bar.CreateTaskInput value, global::System.Collections.Generic.Dictionary<global::System.String, global::StrawberryShake.Upload?> files)
         {
-            var pathFoo = path + ".foo";
-            var valueFoo = value.Foo;
-            if (valueFoo is { } valueFoo_i)
+            var pathUploadOne = path + ".uploadOne";
+            var valueUploadOne = value.UploadOne;
+            if (valueUploadOne is { } valueUploadOne_i)
             {
-                MapFilesFromTypeBar(pathFoo, valueFoo_i, files);
+                MapFilesFromTypeFileUpload(pathUploadOne, valueUploadOne_i, files);
+            }
+
+            var pathUploadTwo = path + ".uploadTwo";
+            var valueUploadTwo = value.UploadTwo;
+            if (valueUploadTwo is { } valueUploadTwo_i)
+            {
+                MapFilesFromTypeFileUpload(pathUploadTwo, valueUploadTwo_i, files);
             }
         }
 
-        private void MapFilesFromTypeBar(global::System.String path, global::Foo.Bar.Bar value, global::System.Collections.Generic.Dictionary<global::System.String, global::StrawberryShake.Upload?> files)
+        private void MapFilesFromTypeFileUpload(global::System.String path, global::Foo.Bar.FileUpload value, global::System.Collections.Generic.Dictionary<global::System.String, global::StrawberryShake.Upload?> files)
         {
-            var pathFoo = path + ".foo";
-            var valueFoo = value.Foo;
-            if (valueFoo is { } valueFoo_i)
-            {
-                MapFilesFromTypeBaz(pathFoo, valueFoo_i, files);
-            }
+            var pathFile = path + ".file";
+            var valueFile = value.File;
+            files.Add(pathFile, valueFile is global::StrawberryShake.Upload valueFile_i ? valueFile_i : null);
+            var pathFile2 = path + ".file2";
+            var valueFile2 = value.File2;
+            files.Add(pathFile2, valueFile2 is global::StrawberryShake.Upload valueFile2_i ? valueFile2_i : null);
         }
 
-        private void MapFilesFromTypeBaz(global::System.String path, global::Foo.Bar.Baz value, global::System.Collections.Generic.Dictionary<global::System.String, global::StrawberryShake.Upload?> files)
-        {
-            var pathFoo = path + ".foo";
-            var valueFoo = value.Foo;
-            if (valueFoo is { } valueFoo_i)
-            {
-                MapFilesFromTypeQux(pathFoo, valueFoo_i, files);
-            }
-        }
-
-        private void MapFilesFromTypeQux(global::System.String path, global::Foo.Bar.Qux value, global::System.Collections.Generic.Dictionary<global::System.String, global::StrawberryShake.Upload?> files)
-        {
-            var pathFoo = path + ".foo";
-            var valueFoo = value.Foo;
-            files.Add(pathFoo, valueFoo is global::StrawberryShake.Upload valueFoo_i ? valueFoo_i : null);
-        }
-
-        private void MapFilesFromArgumentInput(global::System.String path, global::Foo.Bar.Test value, global::System.Collections.Generic.Dictionary<global::System.String, global::StrawberryShake.Upload?> files)
+        private void MapFilesFromArgumentInput(global::System.String path, global::Foo.Bar.CreateTaskInput value, global::System.Collections.Generic.Dictionary<global::System.String, global::StrawberryShake.Upload?> files)
         {
             if (value is { } value_i)
             {
-                MapFilesFromTypeTest(path, value_i, files);
+                MapFilesFromTypeCreateTaskInput(path, value_i, files);
             }
         }
 
-        public global::System.IObservable<global::StrawberryShake.IOperationResult<ITestResult>> Watch(global::Foo.Bar.Test input, global::StrawberryShake.ExecutionStrategy? strategy = null)
+        public global::System.IObservable<global::StrawberryShake.IOperationResult<ITestResult>> Watch(global::Foo.Bar.CreateTaskInput input, global::StrawberryShake.ExecutionStrategy? strategy = null)
         {
             var request = CreateRequest(input);
             return _operationExecutor.Watch(request, strategy);
         }
 
-        private global::StrawberryShake.OperationRequest CreateRequest(global::Foo.Bar.Test input)
+        private global::StrawberryShake.OperationRequest CreateRequest(global::Foo.Bar.CreateTaskInput input)
         {
             var variables = new global::System.Collections.Generic.Dictionary<global::System.String, global::System.Object?>();
             variables.Add("input", FormatInput(input));
@@ -699,14 +618,14 @@ namespace Foo.Bar
             return new global::StrawberryShake.OperationRequest(id: TestQueryDocument.Instance.Hash.Value, name: "Test", document: TestQueryDocument.Instance, strategy: global::StrawberryShake.RequestStrategy.Default, files: files, variables: variables);
         }
 
-        private global::System.Object? FormatInput(global::Foo.Bar.Test value)
+        private global::System.Object? FormatInput(global::Foo.Bar.CreateTaskInput value)
         {
             if (value is null)
             {
                 throw new global::System.ArgumentNullException(nameof(value));
             }
 
-            return _testFormatter.Format(value);
+            return _createTaskInputFormatter.Format(value);
         }
 
         global::StrawberryShake.OperationRequest global::StrawberryShake.IOperationRequestFactory.Create(global::System.Collections.Generic.IReadOnlyDictionary<global::System.String, global::System.Object?>? variables)
@@ -719,8 +638,8 @@ namespace Foo.Bar
     /// <summary>
     /// Represents the operation service of the Test GraphQL operation
     /// <code>
-    /// query Test($input: Test!) {
-    ///   foo(input: $input)
+    /// query Test($input: CreateTaskInput!) {
+    ///   upload(input: $input)
     /// }
     /// </code>
     /// </summary>
@@ -730,8 +649,8 @@ namespace Foo.Bar
         global::Foo.Bar.ITestQuery With(global::System.Action<global::StrawberryShake.OperationRequest> configure);
         global::Foo.Bar.ITestQuery WithRequestUri(global::System.Uri requestUri);
         global::Foo.Bar.ITestQuery WithHttpClient(global::System.Net.Http.HttpClient httpClient);
-        global::System.Threading.Tasks.Task<global::StrawberryShake.IOperationResult<ITestResult>> ExecuteAsync(global::Foo.Bar.Test input, global::System.Threading.CancellationToken cancellationToken = default);
-        global::System.IObservable<global::StrawberryShake.IOperationResult<ITestResult>> Watch(global::Foo.Bar.Test input, global::StrawberryShake.ExecutionStrategy? strategy = null);
+        global::System.Threading.Tasks.Task<global::StrawberryShake.IOperationResult<ITestResult>> ExecuteAsync(global::Foo.Bar.CreateTaskInput input, global::System.Threading.CancellationToken cancellationToken = default);
+        global::System.IObservable<global::StrawberryShake.IOperationResult<ITestResult>> Watch(global::Foo.Bar.CreateTaskInput input, global::StrawberryShake.ExecutionStrategy? strategy = null);
     }
 
     // StrawberryShake.CodeGeneration.CSharp.Generators.ClientGenerator
@@ -766,29 +685,29 @@ namespace Foo.Bar.State
 {
     // StrawberryShake.CodeGeneration.CSharp.Generators.ResultDataFactoryGenerator
     [global::System.CodeDom.Compiler.GeneratedCode("StrawberryShake", "11.0.0")]
-    public partial class Test_1ResultFactory : global::StrawberryShake.IOperationResultDataFactory<global::Foo.Bar.Test_1Result>
+    public partial class TestResultFactory : global::StrawberryShake.IOperationResultDataFactory<global::Foo.Bar.TestResult>
     {
         private readonly global::StrawberryShake.IEntityStore _entityStore;
-        public Test_1ResultFactory(global::StrawberryShake.IEntityStore entityStore)
+        public TestResultFactory(global::StrawberryShake.IEntityStore entityStore)
         {
             _entityStore = entityStore ?? throw new global::System.ArgumentNullException(nameof(entityStore));
         }
 
         global::System.Type global::StrawberryShake.IOperationResultDataFactory.ResultType => typeof(global::Foo.Bar.ITestResult);
 
-        public Test_1Result Create(global::StrawberryShake.IOperationResultDataInfo dataInfo, global::StrawberryShake.IEntityStoreSnapshot? snapshot = null)
+        public TestResult Create(global::StrawberryShake.IOperationResultDataInfo dataInfo, global::StrawberryShake.IEntityStoreSnapshot? snapshot = null)
         {
             if (snapshot is null)
             {
                 snapshot = _entityStore.CurrentSnapshot;
             }
 
-            if (dataInfo is Test_1ResultInfo info)
+            if (dataInfo is TestResultInfo info)
             {
-                return new Test_1Result(info.Foo);
+                return new TestResult(info.Upload);
             }
 
-            throw new global::System.ArgumentException("Test_1ResultInfo expected.");
+            throw new global::System.ArgumentException("TestResultInfo expected.");
         }
 
         global::System.Object global::StrawberryShake.IOperationResultDataFactory.Create(global::StrawberryShake.IOperationResultDataInfo dataInfo, global::StrawberryShake.IEntityStoreSnapshot? snapshot)
@@ -799,53 +718,47 @@ namespace Foo.Bar.State
 
     // StrawberryShake.CodeGeneration.CSharp.Generators.ResultInfoGenerator
     [global::System.CodeDom.Compiler.GeneratedCode("StrawberryShake", "11.0.0")]
-    public partial class Test_1ResultInfo : global::StrawberryShake.IOperationResultDataInfo
+    public partial class TestResultInfo : global::StrawberryShake.IOperationResultDataInfo
     {
         private readonly global::System.Collections.Generic.IReadOnlyCollection<global::StrawberryShake.EntityId> _entityIds;
         private readonly global::System.UInt64 _version;
-        public Test_1ResultInfo(global::System.String? foo, global::System.Collections.Generic.IReadOnlyCollection<global::StrawberryShake.EntityId> entityIds, global::System.UInt64 version)
+        public TestResultInfo(global::System.String? upload, global::System.Collections.Generic.IReadOnlyCollection<global::StrawberryShake.EntityId> entityIds, global::System.UInt64 version)
         {
-            Foo = foo;
+            Upload = upload;
             _entityIds = entityIds ?? throw new global::System.ArgumentNullException(nameof(entityIds));
             _version = version;
         }
 
-        public global::System.String? Foo { get; }
+        public global::System.String? Upload { get; }
         public global::System.Collections.Generic.IReadOnlyCollection<global::StrawberryShake.EntityId> EntityIds => _entityIds;
         public global::System.UInt64 Version => _version;
 
         public global::StrawberryShake.IOperationResultDataInfo WithVersion(global::System.UInt64 version)
         {
-            return new Test_1ResultInfo(Foo, _entityIds, version);
+            return new TestResultInfo(Upload, _entityIds, version);
         }
     }
 
     // StrawberryShake.CodeGeneration.CSharp.Generators.InputTypeStateInterfaceGenerator
     [global::System.CodeDom.Compiler.GeneratedCode("StrawberryShake", "0.0.0.0")]
-    internal interface ITestInfo
+    internal interface ICreateTaskInputInfo
     {
-        global::System.Boolean IsFooSet { get; }
+        global::System.Boolean IsTitleSet { get; }
+
+        global::System.Boolean IsUploadOneSet { get; }
+
+        global::System.Boolean IsUploadTwoSet { get; }
     }
 
     // StrawberryShake.CodeGeneration.CSharp.Generators.InputTypeStateInterfaceGenerator
     [global::System.CodeDom.Compiler.GeneratedCode("StrawberryShake", "0.0.0.0")]
-    internal interface IBarInfo
+    internal interface IFileUploadInfo
     {
-        global::System.Boolean IsFooSet { get; }
-    }
+        global::System.Boolean IsMetadataSet { get; }
 
-    // StrawberryShake.CodeGeneration.CSharp.Generators.InputTypeStateInterfaceGenerator
-    [global::System.CodeDom.Compiler.GeneratedCode("StrawberryShake", "0.0.0.0")]
-    internal interface IBazInfo
-    {
-        global::System.Boolean IsFooSet { get; }
-    }
+        global::System.Boolean IsFileSet { get; }
 
-    // StrawberryShake.CodeGeneration.CSharp.Generators.InputTypeStateInterfaceGenerator
-    [global::System.CodeDom.Compiler.GeneratedCode("StrawberryShake", "0.0.0.0")]
-    internal interface IQuxInfo
-    {
-        global::System.Boolean IsFooSet { get; }
+        global::System.Boolean IsFile2Set { get; }
     }
 
     // StrawberryShake.CodeGeneration.CSharp.Generators.JsonResultBuilderGenerator
@@ -854,15 +767,15 @@ namespace Foo.Bar.State
     {
         private readonly global::StrawberryShake.IEntityStore _entityStore;
         private readonly global::StrawberryShake.IEntityIdSerializer _idSerializer;
-        private readonly global::StrawberryShake.Serialization.ILeafValueParser<global::System.String, global::StrawberryShake.Upload> _uploadParser;
         private readonly global::StrawberryShake.Serialization.ILeafValueParser<global::System.String, global::System.String> _stringParser;
+        private readonly global::StrawberryShake.Serialization.ILeafValueParser<global::System.String, global::StrawberryShake.Upload> _uploadParser;
         public TestBuilder(global::StrawberryShake.IEntityStore entityStore, global::StrawberryShake.IEntityIdSerializer idSerializer, global::StrawberryShake.IOperationResultDataFactory<global::Foo.Bar.ITestResult> resultDataFactory, global::StrawberryShake.Serialization.ISerializerResolver serializerResolver)
         {
             _entityStore = entityStore ?? throw new global::System.ArgumentNullException(nameof(entityStore));
             _idSerializer = idSerializer ?? throw new global::System.ArgumentNullException(nameof(idSerializer));
             ResultDataFactory = resultDataFactory ?? throw new global::System.ArgumentNullException(nameof(resultDataFactory));
-            _uploadParser = serializerResolver.GetLeafValueParser<global::System.String, global::StrawberryShake.Upload>("Upload") ?? throw new global::System.ArgumentException("No serializer for type `Upload` found.");
             _stringParser = serializerResolver.GetLeafValueParser<global::System.String, global::System.String>("String") ?? throw new global::System.ArgumentException("No serializer for type `String` found.");
+            _uploadParser = serializerResolver.GetLeafValueParser<global::System.String, global::StrawberryShake.Upload>("Upload") ?? throw new global::System.ArgumentException("No serializer for type `Upload` found.");
         }
 
         protected override global::StrawberryShake.IOperationResultDataFactory<global::Foo.Bar.ITestResult> ResultDataFactory { get; }
@@ -875,7 +788,7 @@ namespace Foo.Bar.State
             {
                 snapshot = session.CurrentSnapshot;
             });
-            return new Test_1ResultInfo(Deserialize_String(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "foo")), entityIds, snapshot.Version);
+            return new TestResultInfo(Deserialize_String(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "upload")), entityIds, snapshot.Version);
         }
 
         private global::System.String? Deserialize_String(global::System.Text.Json.JsonElement? obj)
@@ -985,12 +898,10 @@ namespace Microsoft.Extensions.DependencyInjection
             global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::StrawberryShake.Serialization.ISerializer, global::StrawberryShake.Serialization.UriSerializer>(services);
             global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::StrawberryShake.Serialization.ISerializer, global::StrawberryShake.Serialization.UrlSerializer>(services);
             global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::StrawberryShake.Serialization.ISerializer, global::StrawberryShake.Serialization.UUIDSerializer>(services);
-            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::StrawberryShake.Serialization.ISerializer, global::Foo.Bar.TestInputValueFormatter>(services);
-            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::StrawberryShake.Serialization.ISerializer, global::Foo.Bar.BarInputValueFormatter>(services);
-            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::StrawberryShake.Serialization.ISerializer, global::Foo.Bar.BazInputValueFormatter>(services);
-            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::StrawberryShake.Serialization.ISerializer, global::Foo.Bar.QuxInputValueFormatter>(services);
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::StrawberryShake.Serialization.ISerializer, global::Foo.Bar.CreateTaskInputInputValueFormatter>(services);
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::StrawberryShake.Serialization.ISerializer, global::Foo.Bar.FileUploadInputValueFormatter>(services);
             global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::StrawberryShake.Serialization.ISerializerResolver>(services, sp => new global::StrawberryShake.Serialization.SerializerResolver(global::System.Linq.Enumerable.Concat(global::Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<global::System.Collections.Generic.IEnumerable<global::StrawberryShake.Serialization.ISerializer>>(parentServices), global::Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<global::System.Collections.Generic.IEnumerable<global::StrawberryShake.Serialization.ISerializer>>(sp))));
-            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::StrawberryShake.IOperationResultDataFactory<global::Foo.Bar.ITestResult>, global::Foo.Bar.State.Test_1ResultFactory>(services);
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::StrawberryShake.IOperationResultDataFactory<global::Foo.Bar.ITestResult>, global::Foo.Bar.State.TestResultFactory>(services);
             global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::StrawberryShake.IOperationResultDataFactory>(services, sp => global::Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<global::StrawberryShake.IOperationResultDataFactory<global::Foo.Bar.ITestResult>>(sp));
             global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::StrawberryShake.IOperationRequestFactory>(services, sp => global::Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<global::Foo.Bar.ITestQuery>(sp));
             global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::StrawberryShake.IOperationResultBuilder<global::System.Text.Json.JsonDocument, global::Foo.Bar.ITestResult>, global::Foo.Bar.State.TestBuilder>(services);
