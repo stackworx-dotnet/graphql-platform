@@ -3851,7 +3851,7 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsIntrospectio
                 return new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsIntrospection.State.__TypeData(typename, name: Deserialize_String(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsIntrospection.State.__TypeData? Deserialize_IIntrospectionQuery___schema_SubscriptionType(global::System.Text.Json.JsonElement? obj)
@@ -3872,7 +3872,7 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsIntrospectio
                 return new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsIntrospection.State.__TypeData(typename, name: Deserialize_String(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.Collections.Generic.IReadOnlyList<global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsIntrospection.State.__TypeData> Deserialize_NonNullableIIntrospectionQuery___schema_TypesNonNullableArray(global::System.Text.Json.JsonElement? obj)
@@ -4070,7 +4070,7 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsIntrospectio
                 return new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsIntrospection.State.__TypeData(typename, kind: Deserialize_NonNullable__TypeKind(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "kind")), name: Deserialize_String(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name")), ofType: Deserialize_IIntrospectionQuery___schema_Types_Interfaces_OfType_OfType(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "ofType")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsIntrospection.State.__TypeData? Deserialize_IIntrospectionQuery___schema_Types_Interfaces_OfType_OfType(global::System.Text.Json.JsonElement? obj)
@@ -4091,7 +4091,7 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsIntrospectio
                 return new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsIntrospection.State.__TypeData(typename, kind: Deserialize_NonNullable__TypeKind(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "kind")), name: Deserialize_String(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name")), ofType: Deserialize_IIntrospectionQuery___schema_Types_Interfaces_OfType_OfType_OfType(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "ofType")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsIntrospection.State.__TypeData? Deserialize_IIntrospectionQuery___schema_Types_Interfaces_OfType_OfType_OfType(global::System.Text.Json.JsonElement? obj)
@@ -4112,7 +4112,7 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsIntrospectio
                 return new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsIntrospection.State.__TypeData(typename, kind: Deserialize_NonNullable__TypeKind(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "kind")), name: Deserialize_String(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsIntrospection.State.__TypeData Deserialize_NonNullableIIntrospectionQuery___schema_Types_Fields_Type(global::System.Text.Json.JsonElement? obj)

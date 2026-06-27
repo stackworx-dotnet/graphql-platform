@@ -603,7 +603,7 @@ namespace Foo.Bar.State
                 return new global::Foo.Bar.State.MagazineData(typename, isbn: Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "isbn")), coverImageUrl: Deserialize_String(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "coverImageUrl")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.String Deserialize_NonNullableString(global::System.Text.Json.JsonElement? obj)

@@ -767,10 +767,11 @@ namespace Foo.Bar.State
                 throw new global::System.ArgumentNullException();
             }
 
-            global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
-            entityIds.Add(entityId);
-            if (entityId.Name.Equals("Human", global::System.StringComparison.Ordinal))
+            var typename = obj.Value.GetProperty("__typename").GetString();
+            if (typename?.Equals("Human", global::System.StringComparison.Ordinal) ?? false)
             {
+                global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
+                entityIds.Add(entityId);
                 if (session.CurrentSnapshot.TryGetEntity(entityId, out global::Foo.Bar.State.HumanEntity? entity))
                 {
                     session.SetEntity(entityId, new global::Foo.Bar.State.HumanEntity(Deserialize_String(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "homePlanet"))));

@@ -546,7 +546,7 @@ namespace Foo.Bar.State
                 return new global::Foo.Bar.State.BookData(typename, title: Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "title")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.String Deserialize_NonNullableString(global::System.Text.Json.JsonElement? obj)

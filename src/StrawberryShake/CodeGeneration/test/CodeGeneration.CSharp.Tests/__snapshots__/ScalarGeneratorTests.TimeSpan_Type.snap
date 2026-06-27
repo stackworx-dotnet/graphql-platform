@@ -457,7 +457,7 @@ namespace Foo.Bar.State
                 return new global::Foo.Bar.State.PersonData(typename, timeSpan: Deserialize_TimeSpan(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "timeSpan")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.TimeSpan? Deserialize_TimeSpan(global::System.Text.Json.JsonElement? obj)

@@ -470,7 +470,7 @@ namespace Foo.Bar.State
                 return new global::Foo.Bar.State.PersonData(typename, uuid: Deserialize_Guid(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "Uuid")), uUID: Deserialize_Guid(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "UUID")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.Guid? Deserialize_Guid(global::System.Text.Json.JsonElement? obj)

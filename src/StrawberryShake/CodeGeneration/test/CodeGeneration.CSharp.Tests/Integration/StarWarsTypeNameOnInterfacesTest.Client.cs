@@ -665,10 +665,11 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsTypeNameOnIn
                 return null;
             }
 
-            global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
-            entityIds.Add(entityId);
-            if (entityId.Name.Equals("Droid", global::System.StringComparison.Ordinal))
+            var typename = obj.Value.GetProperty("__typename").GetString();
+            if (typename?.Equals("Droid", global::System.StringComparison.Ordinal) ?? false)
             {
+                global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
+                entityIds.Add(entityId);
                 if (session.CurrentSnapshot.TryGetEntity(entityId, out global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsTypeNameOnInterfaces.State.DroidEntity? entity))
                 {
                     session.SetEntity(entityId, new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsTypeNameOnInterfaces.State.DroidEntity(Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "__typename"))));
@@ -681,8 +682,10 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsTypeNameOnIn
                 return entityId;
             }
 
-            if (entityId.Name.Equals("Human", global::System.StringComparison.Ordinal))
+            if (typename?.Equals("Human", global::System.StringComparison.Ordinal) ?? false)
             {
+                global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
+                entityIds.Add(entityId);
                 if (session.CurrentSnapshot.TryGetEntity(entityId, out global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsTypeNameOnInterfaces.State.HumanEntity? entity))
                 {
                     session.SetEntity(entityId, new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsTypeNameOnInterfaces.State.HumanEntity(Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "__typename"))));
@@ -695,7 +698,7 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsTypeNameOnIn
                 return entityId;
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.String Deserialize_NonNullableString(global::System.Text.Json.JsonElement? obj)

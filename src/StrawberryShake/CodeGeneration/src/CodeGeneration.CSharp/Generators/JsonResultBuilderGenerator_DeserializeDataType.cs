@@ -15,11 +15,15 @@ public partial class JsonResultBuilderGenerator
         ClassBuilder classBuilder,
         MethodBuilder methodBuilder,
         ComplexTypeDescriptor complexTypeDescriptor,
-        HashSet<string> processed)
+        HashSet<string> processed,
+        bool isNonNull)
     {
         if (complexTypeDescriptor is InterfaceTypeDescriptor interfaceTypeDescriptor)
         {
-            AddInterfaceDataTypeDeserializerToMethod(methodBuilder, interfaceTypeDescriptor);
+            AddInterfaceDataTypeDeserializerToMethod(
+                methodBuilder,
+                interfaceTypeDescriptor,
+                isNonNull);
         }
         else
         {
@@ -42,7 +46,8 @@ public partial class JsonResultBuilderGenerator
 
     private void AddInterfaceDataTypeDeserializerToMethod(
         MethodBuilder methodBuilder,
-        InterfaceTypeDescriptor interfaceTypeDescriptor)
+        InterfaceTypeDescriptor interfaceTypeDescriptor,
+        bool isNonNull)
     {
         methodBuilder.AddCode(
             AssignmentBuilder
@@ -77,7 +82,7 @@ public partial class JsonResultBuilderGenerator
 
         methodBuilder
             .AddEmptyLine()
-            .AddCode(ExceptionBuilder.New(TypeNames.NotSupportedException));
+            .AddCode(CreateUnknownTypeFallback(isNonNull));
     }
 
     private MethodCallBuilder CreateBuildDataStatement(ObjectTypeDescriptor concreteType)

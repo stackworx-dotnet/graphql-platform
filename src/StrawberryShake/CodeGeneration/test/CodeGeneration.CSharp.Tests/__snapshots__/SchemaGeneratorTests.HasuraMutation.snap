@@ -4040,7 +4040,7 @@ namespace Foo.Bar.State
                 return new global::Foo.Bar.State.people_mutation_responseData(typename, affected_Rows: Deserialize_NonNullableInt32(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "affected_rows")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.Int32 Deserialize_NonNullableInt32(global::System.Text.Json.JsonElement? obj)

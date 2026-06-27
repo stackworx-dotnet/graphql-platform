@@ -983,7 +983,7 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.EntityIdOrData.State
                 return new global::StrawberryShake.EntityIdOrData(new global::StrawberryShake.CodeGeneration.CSharp.Integration.EntityIdOrData.State.Quox2Data(typename, foo: Deserialize_String(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "foo"))));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.String? Deserialize_String(global::System.Text.Json.JsonElement? obj)

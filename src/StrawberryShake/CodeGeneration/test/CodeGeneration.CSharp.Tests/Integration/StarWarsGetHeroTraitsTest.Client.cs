@@ -685,10 +685,11 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTrait
                 return null;
             }
 
-            global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
-            entityIds.Add(entityId);
-            if (entityId.Name.Equals("Droid", global::System.StringComparison.Ordinal))
+            var typename = obj.Value.GetProperty("__typename").GetString();
+            if (typename?.Equals("Droid", global::System.StringComparison.Ordinal) ?? false)
             {
+                global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
+                entityIds.Add(entityId);
                 if (session.CurrentSnapshot.TryGetEntity(entityId, out global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTraits.State.DroidEntity? entity))
                 {
                     session.SetEntity(entityId, new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTraits.State.DroidEntity(Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name")), Deserialize_JsonElement(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "traits"))));
@@ -701,8 +702,10 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTrait
                 return entityId;
             }
 
-            if (entityId.Name.Equals("Human", global::System.StringComparison.Ordinal))
+            if (typename?.Equals("Human", global::System.StringComparison.Ordinal) ?? false)
             {
+                global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
+                entityIds.Add(entityId);
                 if (session.CurrentSnapshot.TryGetEntity(entityId, out global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTraits.State.HumanEntity? entity))
                 {
                     session.SetEntity(entityId, new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTraits.State.HumanEntity(Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name")), Deserialize_JsonElement(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "traits"))));
@@ -715,7 +718,7 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTrait
                 return entityId;
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.String Deserialize_NonNullableString(global::System.Text.Json.JsonElement? obj)

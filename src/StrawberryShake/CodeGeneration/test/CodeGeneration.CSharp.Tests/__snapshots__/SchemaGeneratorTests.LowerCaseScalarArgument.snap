@@ -521,10 +521,11 @@ namespace Foo.Bar.State
                 return null;
             }
 
-            global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
-            entityIds.Add(entityId);
-            if (entityId.Name.Equals("people", global::System.StringComparison.Ordinal))
+            var typename = obj.Value.GetProperty("__typename").GetString();
+            if (typename?.Equals("people", global::System.StringComparison.Ordinal) ?? false)
             {
+                global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
+                entityIds.Add(entityId);
                 if (session.CurrentSnapshot.TryGetEntity(entityId, out global::Foo.Bar.State.peopleEntity? entity))
                 {
                     session.SetEntity(entityId, new global::Foo.Bar.State.peopleEntity(Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "id")), Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "firstName")), Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "lastName"))));
@@ -537,7 +538,7 @@ namespace Foo.Bar.State
                 return entityId;
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.String Deserialize_NonNullableString(global::System.Text.Json.JsonElement? obj)

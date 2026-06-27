@@ -781,7 +781,7 @@ namespace Foo.Bar.State
                 return new global::Foo.Bar.State.FeatCollectionSegmentData(typename, items: Update_IGetFeatsPage_Feats_ItemsEntityArray(session, global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "items"), entityIds));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.Collections.Generic.IReadOnlyList<global::StrawberryShake.EntityId?>? Update_IGetFeatsPage_Feats_ItemsEntityArray(global::StrawberryShake.IEntityStoreUpdateSession session, global::System.Text.Json.JsonElement? obj, global::System.Collections.Generic.ISet<global::StrawberryShake.EntityId> entityIds)
@@ -817,10 +817,11 @@ namespace Foo.Bar.State
                 return null;
             }
 
-            global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
-            entityIds.Add(entityId);
-            if (entityId.Name.Equals("Feat", global::System.StringComparison.Ordinal))
+            var typename = obj.Value.GetProperty("__typename").GetString();
+            if (typename?.Equals("Feat", global::System.StringComparison.Ordinal) ?? false)
             {
+                global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
+                entityIds.Add(entityId);
                 if (session.CurrentSnapshot.TryGetEntity(entityId, out global::Foo.Bar.State.FeatEntity? entity))
                 {
                     session.SetEntity(entityId, new global::Foo.Bar.State.FeatEntity(Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name")), Deserialize_NonNullableInt32(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "level")), Deserialize_NonNullableBoolean(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "canBeLearnedMoreThanOnce")), Update_NonNullableIGetFeatsPage_Feats_Items_ActionTypeEntity(session, global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "actionType"), entityIds)));
@@ -833,7 +834,7 @@ namespace Foo.Bar.State
                 return entityId;
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.String Deserialize_NonNullableString(global::System.Text.Json.JsonElement? obj)
@@ -893,10 +894,11 @@ namespace Foo.Bar.State
                 throw new global::System.ArgumentNullException();
             }
 
-            global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
-            entityIds.Add(entityId);
-            if (entityId.Name.Equals("ActionType", global::System.StringComparison.Ordinal))
+            var typename = obj.Value.GetProperty("__typename").GetString();
+            if (typename?.Equals("ActionType", global::System.StringComparison.Ordinal) ?? false)
             {
+                global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
+                entityIds.Add(entityId);
                 if (session.CurrentSnapshot.TryGetEntity(entityId, out global::Foo.Bar.State.ActionTypeEntity? entity))
                 {
                     session.SetEntity(entityId, new global::Foo.Bar.State.ActionTypeEntity(Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name"))));

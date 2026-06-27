@@ -457,7 +457,7 @@ namespace Foo.Bar.State
                 return new global::Foo.Bar.State.PersonData(typename, email: Deserialize_String(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "email")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.String? Deserialize_String(global::System.Text.Json.JsonElement? obj)

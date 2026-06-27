@@ -986,7 +986,7 @@ namespace Foo.Bar.State
                 return new global::Foo.Bar.State.MutationResultData(typename, correlationId: Deserialize_NonNullableGuid(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "correlationId")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.Guid Deserialize_NonNullableGuid(global::System.Text.Json.JsonElement? obj)

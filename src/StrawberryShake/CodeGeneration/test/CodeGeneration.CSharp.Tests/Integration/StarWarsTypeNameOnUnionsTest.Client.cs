@@ -809,10 +809,11 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsTypeNameOnUn
                 return null;
             }
 
-            global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
-            entityIds.Add(entityId);
-            if (entityId.Name.Equals("Starship", global::System.StringComparison.Ordinal))
+            var typename = obj.Value.GetProperty("__typename").GetString();
+            if (typename?.Equals("Starship", global::System.StringComparison.Ordinal) ?? false)
             {
+                global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
+                entityIds.Add(entityId);
                 if (session.CurrentSnapshot.TryGetEntity(entityId, out global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsTypeNameOnUnions.State.StarshipEntity? entity))
                 {
                     session.SetEntity(entityId, new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsTypeNameOnUnions.State.StarshipEntity(Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "__typename"))));
@@ -825,8 +826,10 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsTypeNameOnUn
                 return entityId;
             }
 
-            if (entityId.Name.Equals("Human", global::System.StringComparison.Ordinal))
+            if (typename?.Equals("Human", global::System.StringComparison.Ordinal) ?? false)
             {
+                global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
+                entityIds.Add(entityId);
                 if (session.CurrentSnapshot.TryGetEntity(entityId, out global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsTypeNameOnUnions.State.HumanEntity? entity))
                 {
                     session.SetEntity(entityId, new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsTypeNameOnUnions.State.HumanEntity(Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "__typename"))));
@@ -839,8 +842,10 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsTypeNameOnUn
                 return entityId;
             }
 
-            if (entityId.Name.Equals("Droid", global::System.StringComparison.Ordinal))
+            if (typename?.Equals("Droid", global::System.StringComparison.Ordinal) ?? false)
             {
+                global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
+                entityIds.Add(entityId);
                 if (session.CurrentSnapshot.TryGetEntity(entityId, out global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsTypeNameOnUnions.State.DroidEntity? entity))
                 {
                     session.SetEntity(entityId, new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsTypeNameOnUnions.State.DroidEntity(Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "__typename"))));
@@ -853,7 +858,7 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsTypeNameOnUn
                 return entityId;
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.String Deserialize_NonNullableString(global::System.Text.Json.JsonElement? obj)
