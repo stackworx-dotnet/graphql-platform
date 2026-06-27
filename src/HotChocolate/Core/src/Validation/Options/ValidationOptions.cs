@@ -102,7 +102,7 @@ public sealed class ValidationOptions
 
             field = value;
         }
-    } = 100_000;
+    } = int.MaxValue; // perf/ss-combined: raised so the merged codegen document (672 ops) clears HC0107
 
     /// <summary>
     /// <para>
