@@ -27,6 +27,26 @@ public static class DataTypeDescriptorMapper
             .OfType<UnionType>()
             .ToList();
 
+        // Index every type by its runtime type name so that component lookups below run in
+        // O(1) instead of scanning the whole (potentially very large) type list per component.
+        // A name can map to more than one type; the Single(...) semantics of the original
+        // lookup are preserved at resolution time (see GetTypeByRuntimeName).
+        var typesByRuntimeName =
+            new Dictionary<string, RuntimeTypeMatch>(StringComparer.Ordinal);
+
+        foreach (var type in context.Types)
+        {
+            var runtimeName = type.RuntimeType.Name;
+            if (typesByRuntimeName.TryGetValue(runtimeName, out var match))
+            {
+                typesByRuntimeName[runtimeName] = match.WithAdditional();
+            }
+            else
+            {
+                typesByRuntimeName[runtimeName] = new RuntimeTypeMatch(type);
+            }
+        }
+
         var dataTypeInfos = new Dictionary<string, DataTypeInfo>(StringComparer.Ordinal);
 
         foreach (var dataType in dataTypes)
@@ -74,13 +94,55 @@ public static class DataTypeDescriptorMapper
                 dataTypeInfo.Name,
                 NamingConventions.CreateStateNamespace(context.Namespace),
                 dataTypeInfo.Components
-                    .Select(name => context.Types.Single(
-                        t => t.RuntimeType.Name.Equals(name)))
+                    .Select(name => GetTypeByRuntimeName(typesByRuntimeName, name))
                     .OfType<ComplexTypeDescriptor>()
                     .ToList(),
                 implements,
                 dataTypeInfo.Description);
         }
+    }
+
+    private static INamedTypeDescriptor GetTypeByRuntimeName(
+        Dictionary<string, RuntimeTypeMatch> typesByRuntimeName,
+        string runtimeName)
+    {
+        // Mirror the previous Single(...) semantics: zero matches and more than one match
+        // both throw, exactly as Enumerable.Single did over the full type list.
+        if (!typesByRuntimeName.TryGetValue(runtimeName, out var match))
+        {
+            throw new InvalidOperationException(
+                $"Sequence contains no matching element for runtime type '{runtimeName}'.");
+        }
+
+        if (match.Count > 1)
+        {
+            throw new InvalidOperationException(
+                $"Sequence contains more than one matching element for runtime type "
+                + $"'{runtimeName}'.");
+        }
+
+        return match.First;
+    }
+
+    private readonly struct RuntimeTypeMatch
+    {
+        public RuntimeTypeMatch(INamedTypeDescriptor first)
+        {
+            First = first;
+            Count = 1;
+        }
+
+        private RuntimeTypeMatch(INamedTypeDescriptor first, int count)
+        {
+            First = first;
+            Count = count;
+        }
+
+        public INamedTypeDescriptor First { get; }
+
+        public int Count { get; }
+
+        public RuntimeTypeMatch WithAdditional() => new(First, Count + 1);
     }
 
     private sealed class DataTypeInfo
