@@ -1,0 +1,146 @@
+[
+  {
+    "rule": "FieldsOnCorrectTypeRule",
+    "query": "{ dog { meowVolume } }"
+  },
+  {
+    "rule": "FieldsOnCorrectTypeRule",
+    "query": "fragment f on Dog { unknown_field }"
+  },
+  {
+    "rule": "ScalarLeafsRule",
+    "query": "{ dog { barkVolume { sinceWhen } } }"
+  },
+  {
+    "rule": "ScalarLeafsRule",
+    "query": "{ human }"
+  },
+  {
+    "rule": "KnownArgumentNamesRule",
+    "query": "{ dog { doesKnowCommand(command: SIT) } }"
+  },
+  {
+    "rule": "ProvidedRequiredArgumentsRule",
+    "query": "{ complicatedArgs { multipleReqs(req1: 1) } }"
+  },
+  {
+    "rule": "ProvidedRequiredArgumentsRule",
+    "query": "{ complicatedArgs { nonNullIntArgField } }"
+  },
+  {
+    "rule": "ValuesOfCorrectTypeRule",
+    "query": "{ complicatedArgs { intArgField(intArg: \"abc\") } }"
+  },
+  {
+    "rule": "ValuesOfCorrectTypeRule",
+    "query": "{ complicatedArgs { enumArgField(enumArg: GREEN) } }"
+  },
+  {
+    "rule": "ValuesOfCorrectTypeRule",
+    "query": "{ complicatedArgs { complexArgField(complexArg: { intField: 1 }) } }"
+  },
+  {
+    "rule": "NoUndefinedVariablesRule",
+    "query": "query ($a: Int) { complicatedArgs { intArgField(intArg: $b) } }"
+  },
+  {
+    "rule": "NoUnusedVariablesRule",
+    "query": "query ($a: Int, $b: Int) { complicatedArgs { intArgField(intArg: $a) } }"
+  },
+  {
+    "rule": "NoUnusedFragmentsRule",
+    "query": "query { dog { name } } fragment Unused on Dog { barkVolume }"
+  },
+  {
+    "rule": "KnownFragmentNamesRule",
+    "query": "{ dog { ...UnknownFragment } }"
+  },
+  {
+    "rule": "NoFragmentCyclesRule",
+    "query": "fragment a on Dog { ...b } fragment b on Dog { ...a }"
+  },
+  {
+    "rule": "NoFragmentCyclesRule",
+    "query": "fragment self on Human { relatives { ...self } }"
+  },
+  {
+    "rule": "UniqueOperationNamesRule",
+    "query": "query Foo { dog { name } } query Foo { cat { name } }"
+  },
+  {
+    "rule": "LoneAnonymousOperationRule",
+    "query": "{ dog { name } } query Named { cat { name } }"
+  },
+  {
+    "rule": "UniqueFragmentNamesRule",
+    "query": "fragment F on Dog { name } fragment F on Cat { name } { dog { ...F } }"
+  },
+  {
+    "rule": "FragmentsOnCompositeTypesRule",
+    "query": "fragment scalarFrag on Boolean { __typename }"
+  },
+  {
+    "rule": "FragmentsOnCompositeTypesRule",
+    "query": "{ dog { ... on DogCommand { __typename } } }"
+  },
+  {
+    "rule": "PossibleFragmentSpreadsRule",
+    "query": "fragment c on Cat { __typename } { dog { ...c } }"
+  },
+  {
+    "rule": "UniqueArgumentNamesRule",
+    "query": "{ dog { isHouseTrained(atOtherHomes: true, atOtherHomes: false) } }"
+  },
+  {
+    "rule": "UniqueDirectivesPerLocationRule",
+    "query": "{ dog { name @skip(if: true) @skip(if: false) } }"
+  },
+  {
+    "rule": "KnownDirectivesRule",
+    "query": "{ dog { name @unknownDirective } }"
+  },
+  {
+    "rule": "KnownDirectivesRule",
+    "query": "query @skip(if: true) { dog { name } }"
+  },
+  {
+    "rule": "KnownDirectivesRule (@onField in wrong location)",
+    "query": "query @onField { dog { name } }"
+  },
+  {
+    "rule": "KnownOperationTypesRule",
+    "query": "subscription { dog { name } cat { name } }"
+  },
+  {
+    "rule": "VariablesAreInputTypesRule",
+    "query": "query ($d: Dog) { dog { name } }"
+  },
+  {
+    "rule": "UniqueVariableNamesRule",
+    "query": "query ($x: Int, $x: Int) { complicatedArgs { intArgField(intArg: $x) } }"
+  },
+  {
+    "rule": "UniqueInputFieldNamesRule",
+    "query": "{ complicatedArgs { complexArgField(complexArg: { requiredField: true, intField: 1, intField: 2 }) } }"
+  },
+  {
+    "rule": "VariablesInAllowedPositionRule",
+    "query": "query ($s: String) { complicatedArgs { intArgField(intArg: $s) } }"
+  },
+  {
+    "rule": "ExecutableDefinitionsRule",
+    "query": "type Extra { id: ID } { dog { name } }"
+  },
+  {
+    "rule": "KnownTypeNamesRule",
+    "query": "fragment f on NotAType { __typename } { dog { ...f } }"
+  },
+  {
+    "rule": "OverlappingFieldsCanBeMergedRule",
+    "query": "{ dog { x: name x: barkVolume } }"
+  },
+  {
+    "rule": "OverlappingFieldsCanBeMergedRule",
+    "query": "{ dog { doesKnowCommand(dogCommand: SIT) doesKnowCommand(dogCommand: HEEL) } }"
+  }
+]
