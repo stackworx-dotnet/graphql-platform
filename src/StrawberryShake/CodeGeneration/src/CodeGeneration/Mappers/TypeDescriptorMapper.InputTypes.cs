@@ -2,6 +2,7 @@ using HotChocolate.Types;
 using HotChocolate.Utilities;
 using StrawberryShake.CodeGeneration.Analyzers.Models;
 using StrawberryShake.CodeGeneration.Descriptors.TypeDescriptors;
+using static System.StringComparer;
 
 namespace StrawberryShake.CodeGeneration.Mappers;
 
@@ -33,6 +34,21 @@ public static partial class TypeDescriptorMapper
         Dictionary<string, InputTypeDescriptorModel> typeDescriptors,
         Dictionary<string, INamedTypeDescriptor> leafTypeDescriptors)
     {
+        // Index the descriptors by their GraphQL type name so that resolving a
+        // field's input type is a constant-time lookup instead of a linear scan
+        // per field. The descriptors are keyed by class name (Model.Name) which
+        // can differ from the GraphQL type name (Model.Type.Name) used here, so a
+        // dedicated index is required. First insertion wins, mirroring the prior
+        // First() enumeration order.
+        var descriptorsByTypeName =
+            new Dictionary<string, INamedTypeDescriptor>(typeDescriptors.Count, Ordinal);
+        foreach (var typeDescriptorModel in typeDescriptors.Values)
+        {
+            descriptorsByTypeName.TryAdd(
+                typeDescriptorModel.Model.Type.Name,
+                typeDescriptorModel.Descriptor);
+        }
+
         foreach (var typeDescriptorModel in typeDescriptors.Values)
         {
             var properties = new List<PropertyDescriptor>();
@@ -50,7 +66,7 @@ public static partial class TypeDescriptorMapper
                 {
                     fieldType = GetInputTypeDescriptor(
                         field.Type.NamedType(),
-                        typeDescriptors);
+                        descriptorsByTypeName);
                 }
 
                 properties.Add(
@@ -69,10 +85,8 @@ public static partial class TypeDescriptorMapper
 
     private static INamedTypeDescriptor GetInputTypeDescriptor(
         ITypeDefinition fieldNamedType,
-        Dictionary<string, InputTypeDescriptorModel> typeDescriptors)
+        Dictionary<string, INamedTypeDescriptor> descriptorsByTypeName)
     {
-        return typeDescriptors.Values
-            .First(t => t.Model.Type.Name.EqualsOrdinal(fieldNamedType.Name))
-            .Descriptor;
+        return descriptorsByTypeName[fieldNamedType.Name];
     }
 }

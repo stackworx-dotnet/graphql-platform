@@ -385,6 +385,37 @@ public static partial class TypeDescriptorMapper
         Dictionary<string, TypeDescriptorModel> typeDescriptors,
         Dictionary<string, INamedTypeDescriptor> leafTypeDescriptors)
     {
+        // Index the descriptors so that resolving a field's output type is a
+        // constant-time lookup instead of a linear scan over every operation.
+        //
+        // descriptorsByModel maps each output type model to its descriptor and is
+        // used by the operation-scanning fallback in GetFieldTypeDescriptor.
+        //
+        // interfaceDescriptorsBySelectionSet maps an interface output type's
+        // selection set to its descriptor. A field whose result is an interface is
+        // resolved by the selection set its syntax node points at, which uniquely
+        // identifies the registered interface descriptor. Selection set nodes are
+        // compared by reference (the analyzer interns them), and the first
+        // registered descriptor for a given node wins, mirroring the descriptor
+        // registration order in CollectTypes.
+        var descriptorsByModel =
+            new Dictionary<OutputTypeModel, ComplexTypeDescriptor>(
+                typeDescriptors.Count);
+        var interfaceDescriptorsBySelectionSet =
+            new Dictionary<SelectionSetNode, ComplexTypeDescriptor>();
+
+        foreach (var typeDescriptorModel in typeDescriptors.Values)
+        {
+            descriptorsByModel[typeDescriptorModel.Model] = typeDescriptorModel.Descriptor;
+
+            if (typeDescriptorModel.Model.IsInterface)
+            {
+                interfaceDescriptorsBySelectionSet.TryAdd(
+                    typeDescriptorModel.Model.SelectionSet,
+                    typeDescriptorModel.Descriptor);
+            }
+        }
+
         foreach (var typeDescriptorModel in typeDescriptors.Values.ToList())
         {
             var properties = new List<PropertyDescriptor>();
@@ -399,13 +430,20 @@ public static partial class TypeDescriptorMapper
                 {
                     fieldType = leafTypeDescriptors[namedType.Name];
                 }
+                else if (field.SyntaxNode.SelectionSet is { } selectionSet
+                    && interfaceDescriptorsBySelectionSet.TryGetValue(
+                        selectionSet,
+                        out var interfaceDescriptor))
+                {
+                    fieldType = interfaceDescriptor;
+                }
                 else
                 {
                     fieldType = GetFieldTypeDescriptor(
                         model,
                         field.SyntaxNode,
                         field.Type.NamedType(),
-                        typeDescriptors);
+                        descriptorsByModel);
                 }
 
                 var propertyKind = includeOrSkipDirective
@@ -468,7 +506,7 @@ public static partial class TypeDescriptorMapper
         ClientModel model,
         FieldNode fieldSyntax,
         ITypeDefinition fieldNamedType,
-        Dictionary<string, TypeDescriptorModel> typeDescriptors)
+        Dictionary<OutputTypeModel, ComplexTypeDescriptor> descriptorsByModel)
     {
         foreach (var operation in model.Operations)
         {
@@ -477,9 +515,7 @@ public static partial class TypeDescriptorMapper
                     fieldNamedType,
                     out var fieldType))
             {
-                return typeDescriptors.Values
-                    .First(t => t.Model == fieldType)
-                    .Descriptor;
+                return descriptorsByModel[fieldType];
             }
         }
 
