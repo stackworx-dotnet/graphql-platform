@@ -1,0 +1,14 @@
+{
+  "name": "strawberry-shake-codegen-fuzz",
+  "private": true,
+  "type": "module",
+  "description": "Differential fuzzer: valid GraphQL (graphql-js oracle) that StrawberryShake fails to generate or emits non-compiling C#.",
+  "scripts": {
+    "fuzz": "node fuzz.mjs",
+    "validate": "node node-runner.mjs",
+    "report": "node report.mjs"
+  },
+  "dependencies": {
+    "graphql": "^16.9.0"
+  }
+}

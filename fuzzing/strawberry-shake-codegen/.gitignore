@@ -1,0 +1,6 @@
+node_modules/
+corpus*.jsonl
+*-results.jsonl
+out*.json
+bin/
+obj/

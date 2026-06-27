@@ -1,0 +1,106 @@
+# Shared schema for StrawberryShake codegen differential fuzzing.
+# Must load identically in graphql-js `buildSchema` (the validity oracle) and in
+# HotChocolate/StrawberryShake `SchemaHelper.Load`. Therefore NO StrawberryShake-only
+# directives here (@key/@serializationType live in schema.extensions.graphql, which
+# only StrawberryShake loads). Rich in interfaces, unions, entities (id: ID!), nested
+# objects, lists and connections to maximise fragment codegen surface.
+
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+scalar DateTime
+
+interface Node {
+  id: ID!
+}
+
+interface Animal {
+  id: ID!
+  name: String!
+  owner: User
+}
+
+type User implements Node {
+  id: ID!
+  name: String!
+  email: String
+  createdAt: DateTime
+  role: Role
+  avatar: Image
+  friends(first: Int, after: String): UserConnection
+  pets: [Pet!]
+  bestFriend: User
+}
+
+type Image {
+  url: String!
+  width: Int
+  height: Int
+  thumbnail(size: Int): Image
+}
+
+type Dog implements Node & Animal {
+  id: ID!
+  name: String!
+  owner: User
+  barkVolume: Int
+  knowsCommand(command: Command): Boolean
+}
+
+type Cat implements Node & Animal {
+  id: ID!
+  name: String!
+  owner: User
+  livesLeft: Int
+  meowVolume: Int
+}
+
+union Pet = Dog | Cat
+
+union SearchResult = User | Dog | Cat
+
+enum Role {
+  ADMIN
+  MEMBER
+  GUEST
+}
+
+enum Command {
+  SIT
+  HEEL
+  DOWN
+}
+
+type UserEdge {
+  node: User
+  cursor: String!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type UserConnection {
+  edges: [UserEdge!]
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+type Query {
+  me: User
+  node(id: ID!): Node
+  user(id: ID!): User
+  users(first: Int, after: String): UserConnection
+  pet: Pet
+  animal: Animal
+  search(term: String!): [SearchResult!]
+}
+
+type Mutation {
+  followUser(userId: ID!): User
+}

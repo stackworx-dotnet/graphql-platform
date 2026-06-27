@@ -1,0 +1,9 @@
+# StrawberryShake-only schema extensions. graphql-js never loads this file.
+# @key marks the global entity id field (types with `id` become entities, which
+# is where the richest fragment/entity codegen lives). @serializationType binds the
+# custom DateTime scalar to a CLR type so generation does not fail on it.
+
+extend schema @key(fields: "id")
+
+extend scalar DateTime
+  @serializationType(name: "global::System.DateTime")
