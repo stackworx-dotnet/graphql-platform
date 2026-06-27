@@ -455,8 +455,16 @@ public static class FragmentHelper
             var fields = new HashSet<string>();
             levels.Push(fields);
 
-            implements.Add(
-                CreateInterface(context, child, selectionPath, levels, rootImplements));
+            var @interface =
+                CreateInterface(context, child, selectionPath, levels, rootImplements);
+
+            // the same named fragment can be spread more than once in a single selection
+            // set. Each spread resolves to the same cached interface model, so we must not
+            // list it twice or the generated type would declare a duplicate base interface.
+            if (!implements.Contains(@interface))
+            {
+                implements.Add(@interface);
+            }
 
             // we add all the fields of this interface to the parent fields level so that we
             // do not create the interface field multiple time on the various levels.
