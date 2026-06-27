@@ -8,9 +8,12 @@ HotChocolate's full default rule set
 **reference reports invalid, HotChocolate reports valid**.
 
 Corpus: 36 curated seeds + ~70 hand-written hard cases ([hard.json](./hard.json),
-[hard2.json](./hard2.json)) + ~50k AST-mutation fuzz documents (seeded,
-reproducible). Across all of it HotChocolate matched graphql-js except for the two
-findings below. No `hc_extra` (HC was never *stricter* than the spec) was observed.
+[hard2.json](./hard2.json)) + ~95k AST-mutation fuzz documents (seeded,
+reproducible) whose mutators span value coercion, field merging, directive
+locations, fragment spreads/cycles, variable usage/positions/types, and operation
+structure. Across all of it HotChocolate matched graphql-js except for the two
+findings below — notably the merge/directive/fragment/variable families (common
+divergence points) were clean. No `hc_extra` (HC stricter than the spec) was seen.
 
 Related HotChocolate issues: searched `ChilliCream/graphql-platform` for `Int`
 range / `ValuesOfCorrectType` / input-value / scalar-literal validation — **no
@@ -96,6 +99,12 @@ leaving the document reported valid. The scalar mismatch path
 (`Enter(IValueNode)`, line 335) correctly calls `ReportError`; the list path does
 not. Likely fix: report a "value is not of the correct type" error (as the scalar
 path does) instead of `Break`-ing.
+
+The same defect exists a second time in `VariableVisitor.Enter(ListValueNode)`
+(`src/HotChocolate/Core/src/Validation/Rules/VariableVisitor.cs:283-293`): a list
+value for a non-list type (e.g. an input-object-typed variable default such as
+`$v: ComplexInput = []`) returns `Break` with no `ReportError`. Both list visitors
+need the same fix.
 
 ### Why it matters
 

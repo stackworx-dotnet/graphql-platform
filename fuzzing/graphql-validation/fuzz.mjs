@@ -86,6 +86,19 @@ const fieldMutators = [
   (d) => mutKind(d, Kind.FIELD, (n) => (n.selectionSet ? undefined : { ...n, selectionSet: { kind: Kind.SELECTION_SET, selections: [{ kind: Kind.FIELD, name: NAME(rstr('sub_')) }] } })),
   (d) => mutKind(d, Kind.FIELD, (n) => (n.selectionSet ? { ...n, selectionSet: undefined } : undefined)),
   (d) => mutKind(d, Kind.OPERATION_DEFINITION, (n) => ({ ...n, variableDefinitions: [...(n.variableDefinitions || []), { kind: Kind.VARIABLE_DEFINITION, variable: { kind: Kind.VARIABLE, name: NAME(rstr('unused_')) }, type: { kind: Kind.NAMED_TYPE, name: NAME('Int') } }] })),
+  // OverlappingFieldsCanBeMerged: alias the first two fields in a set to the same name.
+  (d) => mutKind(d, Kind.SELECTION_SET, (n) => {
+    const fs = n.selections.filter((s) => s.kind === Kind.FIELD);
+    if (fs.length < 2) return undefined;
+    const a = { ...fs[0], alias: NAME('m') }, b = { ...fs[1], alias: NAME('m') };
+    return { ...n, selections: n.selections.map((s) => (s === fs[0] ? a : s === fs[1] ? b : s)) };
+  }),
+  // directive used in the wrong location (known directive, illegal spot).
+  (d) => mutKind(d, Kind.OPERATION_DEFINITION, (n) => ({ ...n, directives: [...(n.directives || []), { kind: Kind.DIRECTIVE, name: NAME('onField') }] })),
+  (d) => mutKind(d, Kind.FIELD, (n) => ({ ...n, directives: [...(n.directives || []), { kind: Kind.DIRECTIVE, name: NAME(pick(['onQuery', 'deprecated', 'skip'])) }] })),
+  // variable type changes -> position / coercion mismatches.
+  (d) => mutKind(d, Kind.VARIABLE_DEFINITION, (n) => ({ ...n, type: n.type.kind === Kind.NON_NULL_TYPE ? n.type.type : n.type })),
+  (d) => mutKind(d, Kind.VARIABLE_DEFINITION, (n) => ({ ...n, type: { kind: Kind.NAMED_TYPE, name: NAME(pick(['String', 'Boolean', 'Float', 'DogCommand', 'ComplexInput'])) } })),
 ];
 
 const docMutators = [
