@@ -1,0 +1,9 @@
+{
+  "name": "gql-validation-fuzz",
+  "private": true,
+  "type": "module",
+  "description": "Differential validation fuzzer: graphql-js (reference) vs HotChocolate.",
+  "dependencies": {
+    "graphql": "^17.0.1"
+  }
+}

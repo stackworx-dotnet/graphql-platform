@@ -1,0 +1,19 @@
+[
+  { "rule": "nested-int-overflow", "query": "{ complicatedArgs { nestedArgField(nested: { required: 2147483648 }) } }" },
+  { "rule": "nested-list-int-overflow", "query": "{ complicatedArgs { nestedArgField(nested: { required: 1, ints: [1, 2147483648] }) } }" },
+  { "rule": "nested-list-for-input", "query": "{ complicatedArgs { nestedArgField(nested: { required: 1, child: [] }) } }" },
+  { "rule": "nested-list-of-input-contains-list", "query": "{ complicatedArgs { nestedArgField(nested: { required: 1, children: [{ requiredField: true }, []] }) } }" },
+  { "rule": "nested-missing-required", "query": "{ complicatedArgs { nestedArgField(nested: { child: { requiredField: true } }) } }" },
+  { "rule": "default-string-for-int", "query": "query ($v: Int = \"s\") { complicatedArgs { intArgField(intArg: $v) } }" },
+  { "rule": "default-list-for-input", "query": "query ($v: ComplexInput = []) { complicatedArgs { complexArgField(complexArg: $v) } }" },
+  { "rule": "default-bad-enum", "query": "query ($v: FurColor = NOPE) { complicatedArgs { enumArgField(enumArg: $v) } }" },
+  { "rule": "default-int-overflow", "query": "query ($v: Int = 2147483648) { complicatedArgs { intArgField(intArg: $v) } }" },
+  { "rule": "default-missing-required-input-field", "query": "query ($v: ComplexInput = { intField: 1 }) { complicatedArgs { complexArgField(complexArg: $v) } }" },
+  { "rule": "default-nested-int-overflow", "query": "query ($v: NestedInput = { required: 2147483648 }) { complicatedArgs { nestedArgField(nested: $v) } }" },
+  { "rule": "float-infinity", "query": "{ complicatedArgs { floatArgField(floatArg: 1e400) } }" },
+  { "rule": "float-from-string", "query": "{ complicatedArgs { floatArgField(floatArg: \"NaN\") } }" },
+  { "rule": "VALID-int-for-float", "query": "{ complicatedArgs { floatArgField(floatArg: 3) } }" },
+  { "rule": "VALID-list-coercion-single", "query": "{ complicatedArgs { stringListArgField(stringListArg: \"single\") } }" },
+  { "rule": "VALID-id-int", "query": "{ complicatedArgs { idArgField(idArg: 12345) } }" },
+  { "rule": "id-bool-bad", "query": "{ complicatedArgs { idArgField(idArg: true) } }" }
+]

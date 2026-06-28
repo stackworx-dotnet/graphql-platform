@@ -1,0 +1,10 @@
+node_modules/
+package-lock.json
+# generated corpora and results
+*.jsonl
+out.json
+*-diff.json
+*-err.txt
+# build output
+HcValidationRunner/bin/
+HcValidationRunner/obj/
