@@ -960,7 +960,7 @@ namespace Foo.Bar.State
                 return new global::Foo.Bar.State.BazData(typename, str: Deserialize_String(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "str")), strNonNullable: Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "strNonNullable")), nested: Deserialize_IGetFoo_Foo_Nested(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "nested")), nestedList: Deserialize_NonNullableIGetFoo_Foo_NestedListNonNullableArray(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "nestedList")), nestedMatrix: Deserialize_IGetFoo_Foo_NestedMatrixArrayArray(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "nestedMatrix")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.String? Deserialize_String(global::System.Text.Json.JsonElement? obj)
@@ -1011,7 +1011,7 @@ namespace Foo.Bar.State
                 return new global::Foo.Bar.State.BazData(typename, str: Deserialize_String(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "str")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.Collections.Generic.IReadOnlyList<global::Foo.Bar.State.BazData> Deserialize_NonNullableIGetFoo_Foo_NestedListNonNullableArray(global::System.Text.Json.JsonElement? obj)
@@ -1116,7 +1116,7 @@ namespace Foo.Bar.State
                 return new global::Foo.Bar.State.BazData(typename, str: Deserialize_String(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "str")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
     }
 

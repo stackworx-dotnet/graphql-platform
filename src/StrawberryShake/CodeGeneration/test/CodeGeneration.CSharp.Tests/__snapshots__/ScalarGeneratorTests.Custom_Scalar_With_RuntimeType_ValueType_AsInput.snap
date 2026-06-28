@@ -463,7 +463,7 @@ namespace Foo.Bar.State
                 return new global::Foo.Bar.State.PersonData(typename, setEmail: Deserialize_NonNullableIndex(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "setEmail")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.Index Deserialize_NonNullableIndex(global::System.Text.Json.JsonElement? obj)

@@ -742,10 +742,11 @@ namespace Foo.Bar.State
                 throw new global::System.ArgumentNullException();
             }
 
-            global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
-            entityIds.Add(entityId);
-            if (entityId.Name.Equals("SearchableStore", global::System.StringComparison.Ordinal))
+            var typename = obj.Value.GetProperty("__typename").GetString();
+            if (typename?.Equals("SearchableStore", global::System.StringComparison.Ordinal) ?? false)
             {
+                global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
+                entityIds.Add(entityId);
                 if (session.CurrentSnapshot.TryGetEntity(entityId, out global::Foo.Bar.State.SearchableStoreEntity? entity))
                 {
                     session.SetEntity(entityId, new global::Foo.Bar.State.SearchableStoreEntity(Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "id")), Deserialize_IGetStore2_SearchableStore_BooksArray(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "books")), Deserialize_ISearchResultData(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "search"))));
@@ -815,7 +816,7 @@ namespace Foo.Bar.State
                 return new global::Foo.Bar.State.BookData(typename, isbn: Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "isbn")), title: Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "title")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::Foo.Bar.State.ISearchResultData? Deserialize_ISearchResultData(global::System.Text.Json.JsonElement? obj)
@@ -841,7 +842,7 @@ namespace Foo.Bar.State
                 return new global::Foo.Bar.State.BookData(typename, title: Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "title")), isbn: Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "isbn")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
     }
 

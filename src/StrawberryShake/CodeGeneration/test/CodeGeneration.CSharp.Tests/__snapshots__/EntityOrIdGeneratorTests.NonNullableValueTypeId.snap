@@ -880,7 +880,7 @@ namespace Foo.Bar.State
                 return new global::StrawberryShake.EntityIdOrData(new global::Foo.Bar.State.Quox2Data(typename, foo: Deserialize_NonNullableInt32(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "foo"))));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.Int32 Deserialize_NonNullableInt32(global::System.Text.Json.JsonElement? obj)

@@ -210,11 +210,13 @@ public partial class JsonResultBuilderGenerator : ClassBaseGenerator<ResultBuild
                     .SetType(TypeNames.JsonElement.MakeNullable());
             }
 
+            var isNonNull = typeReference.IsNonNull();
+
             var jsonElementNullCheck = IfBuilder
                 .New()
                 .SetCondition($"!{Obj}.HasValue")
                 .AddCode(
-                    typeReference.IsNonNull()
+                    isNonNull
                         ? ExceptionBuilder.New(TypeNames.ArgumentNullException)
                         : CodeLineBuilder.From("return null;"));
 
@@ -228,7 +230,7 @@ public partial class JsonResultBuilderGenerator : ClassBaseGenerator<ResultBuild
                 .New()
                 .SetCondition($"{Obj}.Value.ValueKind == global::System.Text.Json.JsonValueKind.Null")
                 .AddCode(
-            typeReference.IsNonNull()
+            isNonNull
                 ? ExceptionBuilder.New(TypeNames.ArgumentNullException)
                 : CodeLineBuilder.From("return null;"));
 
@@ -236,7 +238,7 @@ public partial class JsonResultBuilderGenerator : ClassBaseGenerator<ResultBuild
                 .AddCode(jsonElementNullValueKindCheck)
                 .AddEmptyLine();
 
-            AddDeserializeMethodBody(classBuilder, methodBuilder, typeReference, processed);
+            AddDeserializeMethodBody(classBuilder, methodBuilder, typeReference, processed, isNonNull);
         }
     }
 
@@ -244,7 +246,8 @@ public partial class JsonResultBuilderGenerator : ClassBaseGenerator<ResultBuild
         ClassBuilder classBuilder,
         MethodBuilder methodBuilder,
         ITypeDescriptor typeDescriptor,
-        HashSet<string> processed)
+        HashSet<string> processed,
+        bool isNonNull)
     {
         switch (typeDescriptor)
         {
@@ -261,29 +264,42 @@ public partial class JsonResultBuilderGenerator : ClassBaseGenerator<ResultBuild
                     classBuilder,
                     methodBuilder,
                     d,
-                    processed);
+                    processed,
+                    isNonNull);
                 break;
 
             case ComplexTypeDescriptor { Kind: TypeKind.AbstractData } d:
-                AddDataTypeDeserializerMethod(classBuilder, methodBuilder, d, processed);
+                AddDataTypeDeserializerMethod(classBuilder, methodBuilder, d, processed, isNonNull);
                 break;
 
             case ComplexTypeDescriptor { Kind: TypeKind.Data } d:
-                AddDataTypeDeserializerMethod(classBuilder, methodBuilder, d, processed);
+                AddDataTypeDeserializerMethod(classBuilder, methodBuilder, d, processed, isNonNull);
                 break;
 
             case INamedTypeDescriptor { Kind: TypeKind.Entity } d:
-                AddUpdateEntityMethod(classBuilder, methodBuilder, d, processed);
+                AddUpdateEntityMethod(classBuilder, methodBuilder, d, processed, isNonNull);
                 break;
 
             case NonNullTypeDescriptor d:
-                AddDeserializeMethodBody(classBuilder, methodBuilder, d.InnerType, processed);
+                AddDeserializeMethodBody(classBuilder, methodBuilder, d.InnerType, processed, isNonNull);
                 break;
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(typeDescriptor));
         }
     }
+
+    /// <summary>
+    /// Builds the fallback that is reached when the transport returns a concrete
+    /// __typename that is unknown to the generated abstract type mapping (for example
+    /// a union or interface member that was added to the server after the client was
+    /// generated). For a nullable position the unknown value degrades to <c>null</c>,
+    /// for a non-null position it remains an error.
+    /// </summary>
+    private static ICode CreateUnknownTypeFallback(bool isNonNull)
+        => isNonNull
+            ? ExceptionBuilder.New(TypeNames.NotSupportedException)
+            : CodeLineBuilder.From("return null;");
 
     private static MethodCallBuilder BuildUpdateMethodCall(PropertyDescriptor property)
     {

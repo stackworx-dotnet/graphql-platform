@@ -793,10 +793,11 @@ namespace Foo.Bar.State
                 return null;
             }
 
-            global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
-            entityIds.Add(entityId);
-            if (entityId.Name.Equals("Expense", global::System.StringComparison.Ordinal))
+            var typename = obj.Value.GetProperty("__typename").GetString();
+            if (typename?.Equals("Expense", global::System.StringComparison.Ordinal) ?? false)
             {
+                global::StrawberryShake.EntityId entityId = _idSerializer.Parse(obj.Value);
+                entityIds.Add(entityId);
                 if (session.CurrentSnapshot.TryGetEntity(entityId, out global::Foo.Bar.State.ExpenseEntity? entity))
                 {
                     session.SetEntity(entityId, new global::Foo.Bar.State.ExpenseEntity(Deserialize_NonNullableGuid(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "id")), Deserialize_NonNullableDecimal(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "amount")), Deserialize_NonNullableDateTimeOffset(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "date")), Deserialize_String(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "description")), Deserialize_NonNullableExpenseCategory(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "category")), Deserialize_NonNullablePaymentMethod(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "paymentMethod")), Deserialize_IAllExpenses_Expense_TagsArray(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "tags"))));
@@ -809,7 +810,7 @@ namespace Foo.Bar.State
                 return entityId;
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.Guid Deserialize_NonNullableGuid(global::System.Text.Json.JsonElement? obj)
@@ -941,7 +942,7 @@ namespace Foo.Bar.State
                 return new global::Foo.Bar.State.TagData(typename, name: Deserialize_String(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
     }
 

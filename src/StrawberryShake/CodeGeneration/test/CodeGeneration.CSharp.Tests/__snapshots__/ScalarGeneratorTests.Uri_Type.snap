@@ -470,7 +470,7 @@ namespace Foo.Bar.State
                 return new global::Foo.Bar.State.PersonData(typename, uri: Deserialize_Uri(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "uri")), uRI: Deserialize_Uri(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "URI")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.Uri? Deserialize_Uri(global::System.Text.Json.JsonElement? obj)

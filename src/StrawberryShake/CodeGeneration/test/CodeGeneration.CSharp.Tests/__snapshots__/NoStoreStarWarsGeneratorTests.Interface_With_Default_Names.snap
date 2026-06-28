@@ -577,7 +577,7 @@ namespace Foo.Bar.State
                 return new global::Foo.Bar.State.HumanData(typename, name: Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name")), appearsIn: Deserialize_EpisodeArray(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "appearsIn")));
             }
 
-            throw new global::System.NotSupportedException();
+            return null;
         }
 
         private global::System.String Deserialize_NonNullableString(global::System.Text.Json.JsonElement? obj)

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using StrawberryShake.CodeGeneration.CSharp.Builders;
 using StrawberryShake.CodeGeneration.Descriptors.TypeDescriptors;
 using StrawberryShake.CodeGeneration.Extensions;
@@ -15,42 +16,41 @@ public partial class JsonResultBuilderGenerator
         ClassBuilder classBuilder,
         MethodBuilder methodBuilder,
         INamedTypeDescriptor namedTypeDescriptor,
-        HashSet<string> processed)
+        HashSet<string> processed,
+        bool isNonNull)
     {
-        methodBuilder.AddCode(
-            AssignmentBuilder
-                .New()
-                .SetLeftHandSide($"{TypeNames.EntityId} {EntityId}")
-                .SetRightHandSide(
-                    MethodCallBuilder
-                        .Inline()
-                        .SetMethodName(GetFieldName(IdSerializer), "Parse")
-                        .AddArgument($"{Obj}.Value")));
-
-        methodBuilder.AddCode(
-            MethodCallBuilder
-                .New()
-                .SetMethodName(EntityIds, nameof(List<object>.Add))
-                .AddArgument(EntityId));
-
-        methodBuilder.AddEmptyLine();
-
         if (namedTypeDescriptor is InterfaceTypeDescriptor interfaceTypeDescriptor)
         {
-            // If the type is an interface
+            // If the type is an interface we first read the concrete __typename and
+            // only parse the entity id for a member that is known to this client. A
+            // member that is unknown (for example one added to the server after the
+            // client was generated) degrades to the fallback instead of failing the
+            // whole result.
+            methodBuilder.AddCode(
+                AssignmentBuilder
+                    .New()
+                    .SetLeftHandSide($"var {Typename}")
+                    .SetRightHandSide(MethodCallBuilder
+                        .Inline()
+                        .SetMethodName(Obj, "Value", nameof(JsonElement.GetProperty))
+                        .AddArgument(WellKnownNames.TypeName.AsStringToken())
+                        .Chain(x => x.SetMethodName(nameof(JsonElement.GetString)))));
+
             foreach (var concreteType in interfaceTypeDescriptor.ImplementedBy)
             {
                 methodBuilder
                     .AddEmptyLine()
-                    .AddCode(CreateUpdateEntityStatement(concreteType)
-                        .AddCode($"return {EntityId};"));
+                    .AddCode(CreateUpdateEntityByTypenameStatement(concreteType));
             }
 
             methodBuilder.AddEmptyLine();
-            methodBuilder.AddCode(ExceptionBuilder.New(TypeNames.NotSupportedException));
+            methodBuilder.AddCode(CreateUnknownTypeFallback(isNonNull));
         }
         else if (namedTypeDescriptor is ObjectTypeDescriptor objectTypeDescriptor)
         {
+            methodBuilder.AddCode(CreateParseEntityIdStatement());
+            methodBuilder.AddEmptyLine();
+
             BuildTryGetEntityIf(
                     CreateEntityType(
                         objectTypeDescriptor.Name,
@@ -64,6 +64,22 @@ public partial class JsonResultBuilderGenerator
 
         AddRequiredDeserializeMethods(namedTypeDescriptor, classBuilder, processed);
     }
+
+    private static ICode CreateParseEntityIdStatement()
+        => CodeBlockBuilder
+            .New()
+            .AddCode(AssignmentBuilder
+                .New()
+                .SetLeftHandSide($"{TypeNames.EntityId} {EntityId}")
+                .SetRightHandSide(
+                    MethodCallBuilder
+                        .Inline()
+                        .SetMethodName(GetFieldName(IdSerializer), "Parse")
+                        .AddArgument($"{Obj}.Value")))
+            .AddCode(MethodCallBuilder
+                .New()
+                .SetMethodName(EntityIds, nameof(List<object>.Add))
+                .AddArgument(EntityId));
 
     private IfBuilder CreateUpdateEntityStatement(
         ObjectTypeDescriptor concreteType)
@@ -88,6 +104,31 @@ public partial class JsonResultBuilderGenerator
         return ifStatement
             .AddCode(ifBuilder)
             .AddEmptyLine();
+    }
+
+    private IfBuilder CreateUpdateEntityByTypenameStatement(
+        ObjectTypeDescriptor concreteType)
+    {
+        var ifStatement = IfBuilder
+            .New()
+            .SetCondition(
+                $"{Typename}?.Equals(\"{concreteType.Name}\", "
+                + $"{TypeNames.OrdinalStringComparison}) ?? false");
+
+        var entityTypeName = CreateEntityType(
+            concreteType.Name,
+            concreteType.RuntimeType.NamespaceWithoutGlobal);
+
+        var ifBuilder = BuildTryGetEntityIf(entityTypeName)
+            .AddCode(CreateEntityConstructorCall(concreteType, false))
+            .AddElse(CreateEntityConstructorCall(concreteType, true));
+
+        return ifStatement
+            .AddCode(CreateParseEntityIdStatement())
+            .AddEmptyLine()
+            .AddCode(ifBuilder)
+            .AddEmptyLine()
+            .AddCode($"return {EntityId};");
     }
 
     private static ICode CreateEntityConstructorCall(
