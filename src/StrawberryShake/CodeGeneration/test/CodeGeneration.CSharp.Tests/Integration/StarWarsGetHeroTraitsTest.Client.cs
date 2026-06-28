@@ -1,4 +1,4 @@
-﻿// ReSharper disable ArrangeObjectCreationWhenTypeEvident
+// ReSharper disable ArrangeObjectCreationWhenTypeEvident
 // ReSharper disable BuiltInTypeReferenceStyle
 // ReSharper disable ConvertToAutoProperty
 // ReSharper disable InconsistentNaming
@@ -691,11 +691,22 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTrait
             {
                 if (session.CurrentSnapshot.TryGetEntity(entityId, out global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTraits.State.DroidEntity? entity))
                 {
-                    session.SetEntity(entityId, new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTraits.State.DroidEntity(Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name")), Deserialize_JsonElement(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "traits"))));
+                    var arg0 = Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name"));
+                    var arg1 = Deserialize_JsonElement(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "traits"));
+                    session.SetEntity(entityId, new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTraits.State.DroidEntity(arg0, arg1));
                 }
                 else
                 {
-                    session.SetEntity(entityId, new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTraits.State.DroidEntity(Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name")), Deserialize_JsonElement(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "traits"))));
+                    var arg0 = Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name"));
+                    var arg1 = Deserialize_JsonElement(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "traits"));
+                    if (session.CurrentSnapshot.TryGetEntity(entityId, out entity))
+                    {
+                        session.SetEntity(entityId, new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTraits.State.DroidEntity(arg0, arg1));
+                    }
+                    else
+                    {
+                        session.SetEntity(entityId, new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTraits.State.DroidEntity(arg0, arg1));
+                    }
                 }
 
                 return entityId;
@@ -705,11 +716,22 @@ namespace StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTrait
             {
                 if (session.CurrentSnapshot.TryGetEntity(entityId, out global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTraits.State.HumanEntity? entity))
                 {
-                    session.SetEntity(entityId, new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTraits.State.HumanEntity(Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name")), Deserialize_JsonElement(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "traits"))));
+                    var arg0 = Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name"));
+                    var arg1 = Deserialize_JsonElement(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "traits"));
+                    session.SetEntity(entityId, new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTraits.State.HumanEntity(arg0, arg1));
                 }
                 else
                 {
-                    session.SetEntity(entityId, new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTraits.State.HumanEntity(Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name")), Deserialize_JsonElement(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "traits"))));
+                    var arg0 = Deserialize_NonNullableString(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "name"));
+                    var arg1 = Deserialize_JsonElement(global::StrawberryShake.Json.JsonElementExtensions.GetPropertyOrNull(obj, "traits"));
+                    if (session.CurrentSnapshot.TryGetEntity(entityId, out entity))
+                    {
+                        session.SetEntity(entityId, new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTraits.State.HumanEntity(arg0, arg1));
+                    }
+                    else
+                    {
+                        session.SetEntity(entityId, new global::StrawberryShake.CodeGeneration.CSharp.Integration.StarWarsGetHeroTraits.State.HumanEntity(arg0, arg1));
+                    }
                 }
 
                 return entityId;

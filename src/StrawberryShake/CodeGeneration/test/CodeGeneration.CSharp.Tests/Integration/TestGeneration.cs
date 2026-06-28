@@ -227,6 +227,127 @@ public class TestGeneration
             "extend schema @key(fields: \"id\")");
 
     [Fact]
+    public void InlineFragmentOrder() =>
+        AssertResult(
+            CreateIntegrationTest(profiles:
+            [
+                new TransportProfile("Default", TransportType.InMemory)
+            ]),
+            skipWarnings: true,
+            """
+            query NotWorkingQuery {
+                people {
+                    id
+                    name
+                    pet {
+                        id
+                        __typename
+                        ... on Cat {
+                            furColor
+                        }
+                        ... on Dog {
+                            breed
+                        }
+                    }
+                }
+                shelters {
+                    id
+                    location
+                    pet {
+                        id
+                        __typename
+                        ... on Bird {
+                            wingSpan
+                        }
+                        ... on Cat {
+                            furColor
+                        }
+                        ... on Dog {
+                            breed
+                        }
+                    }
+                }
+            }
+            """,
+            """
+            type Query {
+                people: [Person!]!
+                shelters: [Shelter!]!
+            }
+
+            interface IPet {
+                id: Int!
+            }
+
+            type Dog implements IPet {
+                id: Int!
+                breed: String!
+            }
+
+            type Cat implements IPet {
+                id: Int!
+                furColor: String!
+            }
+
+            type Bird implements IPet {
+                id: Int!
+                wingSpan: Int!
+            }
+
+            type Person {
+                id: Int!
+                name: String!
+                pet: IPet
+            }
+
+            type Shelter {
+                id: Int!
+                location: String!
+                pet: IPet
+            }
+            """,
+            "extend schema @key(fields: \"id\")");
+
+    [Fact]
+    public void RecursiveEntitySelfReference() =>
+        AssertResult(
+            CreateIntegrationTest(profiles:
+            [
+                new TransportProfile("Default", TransportType.InMemory)
+            ]),
+            skipWarnings: true,
+            """
+            query GetSelfishGuy {
+                selfishGuy {
+                    id
+                    firstName
+                    lastName
+                    bestFriend {
+                        firstName
+                        age
+                        phone
+                    }
+                }
+            }
+            """,
+            """
+            type Query {
+                selfishGuy: Person!
+            }
+
+            type Person {
+                id: String!
+                firstName: String!
+                lastName: String!
+                age: Int!
+                phone: String!
+                zipCode: String!
+                bestFriend: Person
+            }
+            """,
+            "extend schema @key(fields: \"id\")");
+
+    [Fact]
     public void StarWarsIntrospection() =>
         AssertStarWarsResult(
             CreateIntegrationTest(),
