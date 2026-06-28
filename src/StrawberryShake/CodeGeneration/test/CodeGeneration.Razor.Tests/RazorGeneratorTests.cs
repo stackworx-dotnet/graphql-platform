@@ -44,4 +44,33 @@ public class RazorGeneratorTests
             """,
             "extend schema @key(fields: \"id\")");
     }
+
+    [Fact]
+    public void Query_With_Persisted_State()
+    {
+        // force assembly to load!
+        Assert.NotNull(typeof(UseQuery<>));
+
+        AssertResult(
+            settings: new() { RazorPersistedState = true },
+            """
+            query GetBars($a: String! $b: String) {
+              bars(a: $a b: $b) {
+                id
+                name
+              }
+            }
+            """,
+            """
+            type Query {
+              bars(a: String!, b: String): [Bar]
+            }
+
+            type Bar {
+              id: String!
+              name: String
+            }
+            """,
+            "extend schema @key(fields: \"id\")");
+    }
 }

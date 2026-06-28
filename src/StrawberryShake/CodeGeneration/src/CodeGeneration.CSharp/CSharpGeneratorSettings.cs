@@ -49,6 +49,12 @@ public class CSharpGeneratorSettings
     public bool RazorComponents { get; set; }
 
     /// <summary>
+    /// Emit persisted component state wiring so operation results can be persisted via the
+    /// .NET 10 <c>[PersistentState]</c> attribute (requires a store).
+    /// </summary>
+    public bool RazorPersistedState { get; set; }
+
+    /// <summary>
     /// Generate a single CSharp code file.
     /// </summary>
     public bool SingleCodeFile { get; set; } = true;
