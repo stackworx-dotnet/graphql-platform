@@ -184,7 +184,7 @@ namespace Foo.Bar
 
         private void MapFilesFromArgumentUpload(global::System.String path, global::StrawberryShake.Upload value, global::System.Collections.Generic.Dictionary<global::System.String, global::StrawberryShake.Upload?> files)
         {
-            files.Add(path, value is global::StrawberryShake.Upload u ? u : null);
+            files.Add(path, value is global::StrawberryShake.Upload value_i ? value_i : null);
         }
 
         public global::System.IObservable<global::StrawberryShake.IOperationResult<ITestResult>> Watch(global::System.String @string, global::StrawberryShake.Upload upload, global::StrawberryShake.ExecutionStrategy? strategy = null)
