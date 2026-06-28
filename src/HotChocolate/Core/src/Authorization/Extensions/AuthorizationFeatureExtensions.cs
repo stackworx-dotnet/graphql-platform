@@ -155,12 +155,24 @@ internal static class AuthorizationFeatureExtensions
         this ISchemaBuilder builder)
         => builder.Features.GetOrSet<AuthorizationOptions>();
 
+    // Legacy well-known ContextData key for UserState, removed when UserState moved to the typed
+    // Features collection (PRs #8267/#8329). Consumers that bypass the request interceptors
+    // (notably the Strawberry Shake in-memory client) still inject a ready-made UserState under
+    // this key via SetGlobalState, so it is promoted into Features here.
+    private const string LegacyUserStateContextDataKey = "HotChocolate.Authorization.UserState";
+
     public static RequestContext TryCreateUserStateIfNotExists(
         this RequestContext context)
     {
         var userState = context.Features.Get<UserState>();
 
         if (userState is null
+            && context.ContextData.TryGetValue(LegacyUserStateContextDataKey, out var legacyValue)
+            && legacyValue is UserState legacyUserState)
+        {
+            context.Features.Set(legacyUserState);
+        }
+        else if (userState is null
             && context.ContextData.TryGetValue(nameof(ClaimsPrincipal), out var value)
             && value is ClaimsPrincipal principal)
         {

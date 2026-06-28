@@ -954,6 +954,72 @@ public class AnnotationBasedAuthorizationTests
     }
 
     [Fact]
+    public async Task Authorize_Should_Use_Explicit_UserState_When_Passed_Through_ContextData()
+    {
+        // arrange
+        var handler = new AuthHandler(
+            resolver: (ctx, _)
+                => ctx.Features.TryGet(out UserState? _)
+                    ? AuthorizeResult.Allowed
+                    : AuthorizeResult.NotAllowed,
+            validation: (ctx, _)
+                => ctx.Features.TryGet(out UserState? _)
+                    ? AuthorizeResult.Allowed
+                    : AuthorizeResult.NotAllowed);
+
+        var services = CreateServices(
+            handler,
+            options =>
+            {
+                options.ConfigureNodeFields =
+                    descriptor => descriptor.Authorize("READ_NODE");
+            });
+
+        var executor = await services.GetRequestExecutorAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        // act
+        // supply a ready-made UserState under the legacy well-known key (as the in-memory client does)
+        var result = await executor.ExecuteAsync(
+            builder =>
+                builder
+                    .SetDocument(
+                        """
+                        {
+                          nodes(ids: "abc") {
+                            __typename
+                          }
+                        }
+                        """)
+                    .SetGlobalState(
+                        "HotChocolate.Authorization.UserState",
+                        new UserState(new ClaimsPrincipal(), isAuthenticated: true)),
+            TestContext.Current.CancellationToken);
+
+        // assert
+        // auth passes (legacy UserState promoted into Features), so it fails later on the node ID
+        Snapshot
+            .Create()
+            .Add(result)
+            .MatchInline(
+                """
+                {
+                  "errors": [
+                    {
+                      "message": "The node ID string has an invalid format.",
+                      "path": [
+                        "nodes"
+                      ],
+                      "extensions": {
+                        "originalValue": "abc"
+                      }
+                    }
+                  ],
+                  "data": null
+                }
+                """);
+    }
+
+    [Fact]
     public async Task Skip_After_Validation_For_Null()
     {
         // arrange
