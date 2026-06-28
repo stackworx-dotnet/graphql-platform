@@ -163,11 +163,28 @@ internal sealed class FieldCollector
             {
                 if (fieldSelection.IsConditional && !IsConditional(fieldSyntax))
                 {
+                    // the previously selected field becomes a merged-away duplicate of the
+                    // field we now promote to the canonical selection.
                     fieldSelection = new FieldSelection(
                         field,
                         fieldSyntax,
-                        path.Append(responseName));
+                        path.Append(responseName),
+                        duplicates: AppendDuplicate(
+                            fieldSelection.Duplicates,
+                            fieldSelection.SyntaxNode));
                     fields[responseName] = fieldSelection;
+                }
+                else if (!ReferenceEquals(fieldSelection.SyntaxNode, fieldSyntax))
+                {
+                    // the same response name is selected again, for example both directly and
+                    // through a fragment. We keep the first selection canonical but remember the
+                    // duplicate so its sub-selection set can still be resolved later.
+                    fields[responseName] = new FieldSelection(
+                        field,
+                        fieldSelection.SyntaxNode,
+                        fieldSelection.Path,
+                        fieldSelection.IsConditional,
+                        AppendDuplicate(fieldSelection.Duplicates, fieldSyntax));
                 }
             }
             else
@@ -189,6 +206,16 @@ internal sealed class FieldCollector
     }
 
     private static bool IsConditional(IHasDirectives _) => false;
+
+    private static IReadOnlyList<FieldNode> AppendDuplicate(
+        IReadOnlyList<FieldNode> duplicates,
+        FieldNode duplicate)
+    {
+        var list = new List<FieldNode>(duplicates.Count + 1);
+        list.AddRange(duplicates);
+        list.Add(duplicate);
+        return list;
+    }
 
     private void ResolveFragmentSpread(
         FragmentSpreadNode fragmentSpreadSyntax,

@@ -77,6 +77,8 @@ internal class InterfaceTypeSelectionSetAnalyzer : SelectionSetAnalyzer
             selectionVariants.ReturnType.SyntaxNode,
             returnType.SelectionSet);
 
+        RegisterDuplicateSelectionSets(context, fieldSelection, returnType);
+
         foreach (var selectionSet in selectionVariants.Variants)
         {
             returnTypeFragment = FragmentHelper.CreateFragmentNode(
@@ -109,6 +111,28 @@ internal class InterfaceTypeSelectionSetAnalyzer : SelectionSetAnalyzer
         return returnType;
     }
 
+    // A composite field can be selected more than once at the same level, for example both
+    // directly and through a fragment. The selections are merged onto a single canonical field
+    // syntax node, but the parent type model may reference one of the merged-away duplicates as
+    // the property's syntax node. We register those duplicate sub-selection sets against the same
+    // result type so the property type can still be resolved later.
+    private static void RegisterDuplicateSelectionSets(
+        IDocumentAnalyzerContext context,
+        FieldSelection fieldSelection,
+        OutputTypeModel returnType)
+    {
+        foreach (var duplicate in fieldSelection.Duplicates)
+        {
+            if (duplicate.SelectionSet is { } selectionSet)
+            {
+                context.RegisterSelectionSet(
+                    returnType.Type,
+                    selectionSet,
+                    returnType.SelectionSet);
+            }
+        }
+    }
+
     private OutputTypeModel AnalyzeWithHoistedFragment(
         IDocumentAnalyzerContext context,
         FieldSelection fieldSelection,
@@ -135,6 +159,8 @@ internal class InterfaceTypeSelectionSetAnalyzer : SelectionSetAnalyzer
             returnType.Type,
             selectionVariants.ReturnType.SyntaxNode,
             returnType.SelectionSet);
+
+        RegisterDuplicateSelectionSets(context, fieldSelection, returnType);
 
         foreach (var selectionSet in selectionVariants.Variants)
         {
