@@ -270,10 +270,10 @@ public static class GeneratorTestHelper
         }
     }
 
-    private static ClientModel CreateClientModel(
+    public static ClientModel CreateClientModel(
         string[] sourceText,
-        bool strictValidation,
-        bool noStore)
+        bool strictValidation = true,
+        bool noStore = false)
     {
         var files = sourceText
             .Select(s => new GraphQLFile(Utf8GraphQLParser.Parse(s)))

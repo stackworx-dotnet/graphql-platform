@@ -321,6 +321,20 @@ public static class FragmentHelper
             CollectFields(inlineFragment, outputType, fields, path);
         }
 
+        // A named fragment whose type condition is an abstract type (a union or
+        // interface) is not represented as its own interface for a concrete member,
+        // so we have to descend into it to reach the member selections it carries.
+        // Without this, member selections that are only reachable through such a
+        // fragment (for example `... AnimalDetails` where `AnimalDetails` is defined
+        // on the union) are lost and the generated member class comes out empty.
+        foreach (var namedFragment in fragmentNode.Nodes.Where(
+            t => t.Fragment.Kind == FragmentKind.Named
+                && t.Fragment.TypeCondition.IsAbstractType()
+                && t.Fragment.TypeCondition.IsAssignableFrom(outputType)))
+        {
+            CollectFields(namedFragment, outputType, fields, path);
+        }
+
         foreach (var selection in
             fragmentNode.Fragment.SelectionSet.Selections.OfType<FieldNode>())
         {
